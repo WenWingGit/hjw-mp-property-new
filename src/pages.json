@@ -87,6 +87,16 @@
         }
       },
       "layout": "noSideDefault"
+    },
+    {
+      "path": "pages/recharge/recharge",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "预缴物业费",
+        "hidesTabBar": true,
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white"
+      }
     }
   ],
   "subPackages": []

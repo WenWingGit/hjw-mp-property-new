@@ -44,21 +44,6 @@ export const bindSalesUserApi = (salesUserId: number) => {
   return http.post('/WxMinApi/Auth/BindSalesUser', { salesUserId })
 }
 
-/** 获取当前用户关联的销售响应参数 */
-export interface ISalesUserRes {
-  id: number
-  name: string
-  phone: string
-}
-
-// 获取当前用户关联的销售
-export const getSalesUserApi = () => {
-  return http.get<ISalesUserRes>('/WxMinApi/WxMinUser/GetSalesUser')
-}
-
-/**
- * 检查当前用户是否绑定公众号
- */
-export const hasGzhOpenIdApi = () => {
-  return http.get<boolean>('/WxMinApi/WxMinUser/HasGzhOpenId')
+export const getHouseWalletBalanceApi = () => {
+  return ''
 }

@@ -10,7 +10,8 @@ interface NavigateToOptions {
        "/pages/login/changePassword" |
        "/pages/login/login" |
        "/pages/login/register" |
-       "/pages/login/wxLogin";
+       "/pages/login/wxLogin" |
+       "/pages/recharge/recharge";
 }
 interface RedirectToOptions extends NavigateToOptions {}
 

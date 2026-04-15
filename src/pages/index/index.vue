@@ -14,7 +14,7 @@
 
     <view class="header-bg"></view>
 
-    <view class="page-container">
+    <view class="page-container relative z-2">
       <view class="hero-section flex items-center justify-between">
         <view class="hero-text primary-color">
           <view class="text-line">智慧</view>
