@@ -1,0 +1,837 @@
+<route lang="json5" type="page">
+{
+  layout: 'default',
+  style: {
+    navigationBarTitleText: '缴物业费',
+  },
+}
+</route>
+
+<template>
+  <view class="page">
+    <PageNavBar id="page-nav-bar-wrapper" title="缴物业费" :z-index="999" show-back>
+      <!-- <template #right>
+        <text class="nav-right-text" @click="goToMyBills">我的账单</text>
+      </template> -->
+    </PageNavBar>
+
+    <view id="page-filter" class="filter-bar">
+      <view class="filter-item">
+        <text class="filter-text">{{ dateRangeText }}</text>
+        <view v-if="dateRangeText === '全部日期'" class="triangle-down"></view>
+        <view v-else class="date-close-icon" @click.stop="onDateReset">
+          <AppIcon icon="icon-close-solid" />
+        </view>
+        <wd-calendar
+          class="calendar-picker"
+          label=""
+          :z-index="999"
+          type="daterange"
+          :max-date="today.getTime()"
+          v-model="defaultDateRange"
+          @confirm="onDateConfirm"
+        />
+      </view>
+      <view class="filter-item">
+        <text class="filter-text">{{ currentStatusLabel }}</text>
+        <view class="triangle-down"></view>
+        <wd-picker
+          class="status-picker"
+          :model-value="pageQuery.status"
+          :z-index="999"
+          :columns="statusOptions"
+          label=""
+          @confirm="onStatusConfirm"
+        />
+      </view>
+    </view>
+
+    <scroll-view
+      scroll-y
+      :style="{
+        height: 'calc(100vh - ' + outScrollHeight + ')',
+      }"
+      class="list-container"
+      :refresher-threshold="70"
+      refresher-background="#f8f8f8"
+      :refresher-enabled="true"
+      :refresher-triggered="isRefreshLoading"
+      @scrolltolower="onLoadMore"
+      @refresherrefresh="onRefresh"
+    >
+      <view class="page-container sx-py-15">
+        <view class="bill-card" v-for="(item, index) in list" :key="item.id">
+          <view class="card-header">
+            <view class="card-title">
+              <text>{{ item.month }}物业费待缴金额：</text>
+              <text class="title-price">¥{{ item.totalAmount }}</text>
+            </view>
+            <wd-checkbox
+              v-if="item.showCheckBox"
+              v-model="item.checked"
+              checked-color="#ff8c00"
+              shape="square"
+              custom-class="custom-checkbox"
+            ></wd-checkbox>
+          </view>
+
+          <view class="card-info">
+            <view class="info-line">缴费小区：{{ item.community }} | {{ item.room }}</view>
+            <view class="info-line">账单时间：{{ item.billTime }}</view>
+            <view class="info-line">
+              账单状态：
+              <text class="status-text">{{ item.statusText }}</text>
+            </view>
+          </view>
+
+          <view class="fee-detail-box">
+            <view class="fee-row" v-for="(detail, dIndex) in item.details" :key="dIndex">
+              <text class="fee-label">{{ detail.name }}：</text>
+              <text class="fee-value">¥{{ detail.value }}</text>
+            </view>
+          </view>
+
+          <!-- 已缴费才显示 -->
+          <view class="fee-footer" v-if="item.status === 2">
+            <wd-button size="small" type="primary" @click="onCreateCertificate(item)">
+              生成电子凭证
+            </wd-button>
+          </view>
+        </view>
+
+        <ListMore :page-info="pageInfo" empty-text="暂无账单记录" />
+      </view>
+    </scroll-view>
+
+    <view id="bottom-bar" class="bottom-bar">
+      <view class="left-section">
+        <view class="total-line">
+          <text class="total-label">合计：</text>
+          <text class="total-price">¥{{ selectedTotalPrice }}</text>
+        </view>
+        <!-- 有余额这种东西吗？ 没有的话删掉即可 -->
+        <view class="wallet-balance">钱包余额：¥10.00</view>
+      </view>
+      <view class="right-section">
+        <button class="pay-btn" :class="{ disabled: selectedTotalPrice <= 0 }" @click="handlePay">
+          立即支付
+        </button>
+      </view>
+    </view>
+
+    <wd-popup
+      v-model="showPayPopup"
+      position="bottom"
+      custom-style="border-radius: 24rpx 24rpx 0 0; overflow: hidden;"
+    >
+      <view class="popup-container">
+        <view class="popup-header">
+          <text class="popup-title">缴费信息</text>
+          <view class="close-icon" @click="showPayPopup = false">
+            <wd-icon name="close" size="20px" color="#999" />
+          </view>
+        </view>
+
+        <scroll-view scroll-y class="popup-scroll">
+          <view class="popup-summary">
+            物业费汇总：
+            <text>¥{{ propertyTotal }}</text>
+          </view>
+
+          <view class="popup-detail-box" v-for="(item, index) in selectedBills" :key="item.id">
+            <view class="fee-row" v-for="(detail, dIndex) in item.details" :key="dIndex">
+              <text class="fee-label">{{ detail.name }}：</text>
+              <text class="fee-value">¥{{ detail.value }}</text>
+            </view>
+          </view>
+
+          <view class="agreement-box">
+            <wd-checkbox v-model="isAgreed" checked-color="#ff8c00" size="16px">
+              <text class="agreement-text">
+                我已核实收费人物业管理处、收费项目的真实性，并阅读了《服务协议》，我同意支付费用。
+              </text>
+            </wd-checkbox>
+          </view>
+        </scroll-view>
+
+        <view class="popup-bottom-bar">
+          <view class="left-section">
+            <view class="total-line">
+              <text class="total-label">合计：</text>
+              <text class="total-price">¥{{ finalTotal }}</text>
+            </view>
+            <view class="wallet-balance">钱包余额：¥10.00</view>
+          </view>
+          <view class="right-section">
+            <button class="pay-btn" :class="{ disabled: !isAgreed }" @click="confirmPay">
+              立即支付
+            </button>
+          </view>
+        </view>
+      </view>
+    </wd-popup>
+  </view>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useDomRect } from '@/hooks/useDomRect'
+import useLoadPageList from '@/hooks/useLoadPageList'
+import ListMore from '@/components/common/ListMore.vue'
+import BuyBar from '@/components/swim/BuyBar.vue'
+
+// 默认选中今年1月1日到今天
+import dayjs from 'dayjs'
+import { useMessage } from 'wot-design-uni'
+
+const message = useMessage()
+
+// 筛选状态
+const dateRangeText = ref('全部日期')
+const currentStatusLabel = ref('待缴费')
+const thisYear = dayjs().year()
+const today = dayjs().toDate()
+const defaultDateRangeValue = [dayjs(`${thisYear}-01-01`).toDate(), today]
+
+// 日期范围
+const defaultDateRange = ref(defaultDateRangeValue)
+
+// 状态选择器数据
+const statusOptions = ref([
+  { label: '全部状态', value: 0 },
+  { label: '待缴费', value: 1 },
+  { label: '已缴费', value: 2 },
+])
+
+// 滚动内容以外的高度
+const { allRect: outScrollHeight } = useDomRect(
+  ['#page-nav-bar-wrapper', '#page-filter', '#bottom-bar'],
+  'height',
+)
+
+// 创建模拟API函数
+const getBillList = (params: any) => {
+  const allMockData = [
+    {
+      id: 1,
+      month: '2024年7月',
+      totalAmount: '210.39',
+      community: '圭峰小区',
+      room: '5幢402',
+      billTime: '2024/08/05 24:00',
+      statusText: '待缴费',
+      status: 1,
+      billDate: '2024-08-05',
+      checked: false,
+      details: [
+        { name: '物业费（24年7月管理费）', value: '196.03' },
+        { name: '水电费分摊（24年6月分摊费）', value: '14.36' },
+        { name: '电梯费用', value: '0' },
+      ],
+    },
+    {
+      id: 2,
+      month: '2024年6月',
+      totalAmount: '210.39',
+      community: '圭峰小区',
+      room: '5幢402',
+      billTime: '2024/07/05 24:00',
+      statusText: '待缴费',
+      status: 1,
+      billDate: '2024-07-05',
+      checked: false,
+      details: [
+        { name: '物业费（24年6月管理费）', value: '196.03' },
+        { name: '水电费分摊（24年5月分摊费）', value: '14.36' },
+        { name: '电梯费用', value: '0' },
+        { name: '违约金', value: '10' },
+      ],
+    },
+    {
+      id: 3,
+      month: '2024年5月',
+      totalAmount: '196.03',
+      community: '圭峰小区',
+      room: '5幢402',
+      billTime: '2024/06/05 24:00',
+      statusText: '已缴费',
+      status: 2,
+      billDate: '2024-06-05',
+      checked: false,
+      details: [
+        { name: '物业费（24年5月管理费）', value: '196.03' },
+        { name: '水电费分摊（24年4月分摊费）', value: '0' },
+        { name: '电梯费用', value: '0' },
+      ],
+    },
+    {
+      id: 4,
+      month: '2024年4月',
+      totalAmount: '210.39',
+      community: '圭峰小区',
+      room: '5幢402',
+      billTime: '2024/05/05 24:00',
+      statusText: '已缴费',
+      status: 2,
+      billDate: '2024-05-05',
+      checked: false,
+      details: [
+        { name: '物业费（24年4月管理费）', value: '196.03' },
+        { name: '水电费分摊（24年3月分摊费）', value: '14.36' },
+        { name: '电梯费用', value: '0' },
+      ],
+    },
+    {
+      id: 5,
+      month: '2024年3月',
+      totalAmount: '196.03',
+      community: '圭峰小区',
+      room: '5幢402',
+      billTime: '2024/04/05 24:00',
+      statusText: '已缴费',
+      status: 2,
+      billDate: '2024-04-05',
+      checked: false,
+      details: [
+        { name: '物业费（24年3月管理费）', value: '196.03' },
+        { name: '水电费分摊（24年2月分摊费）', value: '0' },
+        { name: '电梯费用', value: '0' },
+      ],
+    },
+  ]
+
+  let filteredData = [...allMockData]
+
+  if (params.status && params.status !== 0) {
+    filteredData = filteredData.filter((item) => item.status === params.status)
+  }
+
+  if (params.startDate && params.endDate) {
+    const startDate = new Date(params.startDate.replace(/\//g, '-'))
+    const endDate = new Date(params.endDate.replace(/\//g, '-'))
+    filteredData = filteredData.filter((item) => {
+      const billDate = new Date(item.billDate)
+      return billDate >= startDate && billDate <= endDate
+    })
+  }
+
+  return Promise.resolve({
+    code: '0000',
+    data: {
+      rows: filteredData,
+      total: filteredData.length,
+      current: params.page,
+      limit: params.limit,
+      totalPage: 1,
+    },
+  })
+}
+
+// 使用useLoadPageList钩子
+const {
+  list,
+  pageQuery,
+  pageInfo,
+  listStatus,
+  getList,
+  onInitList,
+  onRefresh,
+  onLoadMore,
+  isRefreshLoading,
+} = useLoadPageList(
+  getBillList,
+  {
+    page: 1,
+    limit: 10,
+    // TODO: 这里修改需要上传的字段名称
+    // 状态
+    status: 1,
+    // 开始日期
+    startDate: '',
+    //  || defaultDateRange.value[0],
+    // 结束日期
+    endDate: '',
+    // || defaultDateRange.value[1],
+  },
+  {
+    isAutoLoad: true,
+    loadedCallBack: (resList) => {
+      return (resList || []).map((item: any) => ({
+        ...item,
+        showCheckBox: item.status === 1,
+        checked: false,
+      }))
+    },
+  },
+)
+
+// 格式化日期
+const formatDate = (date: Date): string => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+// 日期确认处理
+const onDateConfirm = (value: any) => {
+  const [startDate, endDate] = value?.value || []
+  if (startDate && endDate) {
+    const startStr = formatDate(new Date(startDate))
+    const endStr = formatDate(new Date(endDate))
+    dateRangeText.value = `${startStr}-${endStr}`
+    pageQuery.startDate = startStr
+    pageQuery.endDate = endStr
+    onInitList()
+  }
+}
+
+const onDateReset = () => {
+  defaultDateRange.value = defaultDateRangeValue
+  dateRangeText.value = '全部日期'
+  pageQuery.startDate = ''
+  pageQuery.endDate = ''
+  onInitList()
+}
+
+// 状态确认处理
+const onStatusConfirm = (res: any) => {
+  const { label, value } = res.selectedItems
+  currentStatusLabel.value = label
+  pageQuery.status = value
+  onInitList()
+}
+
+// 计算选中的总价
+const selectedTotalPrice = computed(() => {
+  const total = list.value
+    .filter((item: any) => item.checked)
+    .reduce((sum: number, item: any) => sum + Number(item.totalAmount), 0)
+  return total.toFixed(2)
+})
+
+// 选中的账单
+const selectedBills = computed(() => {
+  return list.value.filter((item: any) => item.checked)
+})
+
+// 物业费用总计
+const propertyTotal = computed(() => {
+  return selectedTotalPrice.value
+})
+
+// 最终总计
+const finalTotal = computed(() => {
+  return selectedTotalPrice.value
+})
+
+// 导航事件
+// const goToMyBills = () => {
+//   uni.navigateTo({ url: '/pages/property/my-bills' })
+// }
+
+// 支付事件
+const handlePay = () => {
+  if (selectedTotalPrice.value <= 0) {
+    uni.showToast({ title: '请先选择账单', icon: 'none' })
+    return
+  }
+  openPayPopup()
+}
+
+// 弹窗状态
+const showPayPopup = ref(false)
+const isAgreed = ref(false)
+
+// 打开弹窗
+const openPayPopup = () => {
+  if (Number(finalTotal.value) <= 0) {
+    uni.showToast({ title: '请先选择账单', icon: 'none' })
+    return
+  }
+  showPayPopup.value = true
+}
+
+// 确认支付
+const confirmPay = () => {
+  if (!isAgreed.value) {
+    uni.showToast({ title: '请先阅读并同意服务协议', icon: 'none' })
+    return
+  }
+  uni.showLoading({ title: '拉起收银台...' })
+  setTimeout(() => {
+    uni.hideLoading()
+    showPayPopup.value = false
+  }, 1500)
+}
+
+const onCreateCertificate = () => {
+  message.alert('生成成功').then(() => {})
+}
+</script>
+
+<style lang="scss" scoped>
+/* 页面容器 */
+.page {
+  background-color: #f5f6f8; /* 还原背景灰白色 */
+}
+/* 导航栏右侧文字 */
+.nav-right-text {
+  font-size: 28rpx;
+  color: #333;
+}
+/* 筛选栏 */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 90rpx;
+  background-color: #ffffff;
+
+  .filter-item {
+    position: relative;
+    display: flex;
+    flex: 1;
+    gap: 8rpx;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+
+    .filter-text {
+      font-size: 26rpx;
+      color: #333;
+    }
+
+    .triangle-down {
+      width: 0;
+      height: 0;
+      margin-top: 4rpx;
+      border-top: 10rpx solid #333;
+      border-right: 8rpx solid transparent;
+      border-left: 8rpx solid transparent;
+    }
+
+    .date-close-icon {
+      position: relative;
+      z-index: 9999;
+    }
+  }
+}
+/* 列表区 */
+.list-container {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.bill-card {
+  padding: 32rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+
+  & + & {
+    margin-top: 24rpx;
+  }
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24rpx;
+
+    .card-title {
+      flex: 1;
+      font-size: 32rpx;
+      font-weight: bold;
+      line-height: 1.4;
+      color: #1a1a1a;
+
+      .title-price {
+        margin-left: 4rpx;
+      }
+    }
+
+    :deep(.custom-checkbox) {
+      margin-top: 4rpx;
+      margin-left: 20rpx;
+    }
+  }
+
+  .card-info {
+    margin-bottom: 24rpx;
+    font-size: 26rpx;
+    line-height: 1.8;
+    color: #999999;
+
+    .status-text {
+      color: #999999; /* 根据设计图，待缴费也是灰色 */
+    }
+  }
+
+  .fee-detail-box {
+    padding: 24rpx;
+    background-color: #f8f9fa;
+    border-radius: 12rpx;
+
+    .fee-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16rpx;
+      font-size: 26rpx;
+      color: #666666;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .fee-value {
+        color: #666666;
+      }
+    }
+  }
+
+  .fee-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24rpx;
+  }
+}
+/* 底部结算栏 */
+.bottom-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background-color: #ffffff;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.04);
+
+  .left-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .total-line {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 4rpx;
+
+      .total-label {
+        font-size: 30rpx;
+        font-weight: bold;
+        color: #333333;
+      }
+
+      .total-price {
+        font-size: 36rpx;
+        font-weight: bold;
+        color: #eb3223; /* 设计图中的红色 */
+      }
+    }
+
+    .wallet-balance {
+      font-size: 22rpx;
+      color: #999999;
+    }
+  }
+
+  .right-section {
+    .pay-btn {
+      width: 240rpx;
+      height: 80rpx;
+      padding: 0;
+      margin: 0;
+      font-size: 30rpx;
+      font-weight: 500;
+      line-height: 80rpx;
+      color: #ffffff;
+      text-align: center;
+      background: #ff8c00; /* 橙色按钮 */
+      border-radius: 40rpx;
+
+      &::after {
+        border: none;
+      }
+
+      &.disabled {
+        color: #ffffff;
+        background: #cccccc;
+      }
+    }
+  }
+}
+/* ================= 弹窗专属样式 ================= */
+.popup-container {
+  display: flex;
+  flex-direction: column;
+  height: 65vh; /* 弹窗高度限制 */
+  background-color: #ffffff;
+}
+
+.popup-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+
+  .popup-title {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .close-icon {
+    position: absolute;
+    top: 50%;
+    right: 32rpx;
+    padding: 10rpx;
+    transform: translateY(-50%);
+  }
+}
+
+.popup-scroll {
+  box-sizing: border-box;
+  flex: 1;
+  padding: 32rpx;
+}
+
+.popup-summary {
+  margin-bottom: 24rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #1a1a1a;
+}
+
+.popup-detail-box {
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+
+  .fee-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16rpx;
+    font-size: 26rpx;
+    color: #666666;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.agreement-box {
+  margin-top: 10rpx;
+  margin-bottom: 40rpx;
+
+  :deep(.wd-checkbox) {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  :deep(.wd-checkbox__shape) {
+    transform: translateY(10rpx);
+  }
+  :deep(.wd-checkbox__label) {
+    flex: 1;
+    margin-left: 16rpx;
+    line-height: 1.5;
+  }
+
+  .agreement-text {
+    font-size: 24rpx;
+    color: #999999;
+  }
+}
+/* 弹窗底部支付栏（样式复用页面底部的结构） */
+.popup-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background-color: #ffffff;
+  border-top: 1rpx solid #f0f0f0;
+
+  .left-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .total-line {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 4rpx;
+
+      .total-label {
+        font-size: 30rpx;
+        font-weight: bold;
+        color: #333333;
+      }
+
+      .total-price {
+        font-size: 36rpx;
+        font-weight: bold;
+        color: #eb3223;
+      }
+    }
+
+    .wallet-balance {
+      font-size: 22rpx;
+      color: #999999;
+    }
+  }
+
+  .right-section {
+    .pay-btn {
+      width: 240rpx;
+      height: 80rpx;
+      padding: 0;
+      margin: 0;
+      font-size: 30rpx;
+      font-weight: 500;
+      line-height: 80rpx;
+      color: #ffffff;
+      text-align: center;
+      background: #ff8c00;
+      border-radius: 40rpx;
+
+      &::after {
+        border: none;
+      }
+
+      &.disabled {
+        color: #ffffff;
+        background: #ffc073; /* 禁用状态的橙色变浅 */
+      }
+    }
+  }
+}
+
+.status-picker {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  :deep(.wd-picker__cell) {
+    opacity: 0;
+  }
+}
+:deep(.wd-picker__cell),
+:deep(.wd-calendar__cell) {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  z-index: 9;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+</style>

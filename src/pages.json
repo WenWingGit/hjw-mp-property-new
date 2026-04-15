@@ -1,0 +1,93 @@
+{
+  "globalStyle": {
+    "navigationStyle": "custom",
+    "navigationBarTitleText": "易联租车",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FFFFFF",
+    "pageOrientation": "auto",
+    "bounce": "none",
+    "pullToRefresh": {
+      "color": "#1d2088"
+    },
+    "titleNView": false
+  },
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^wd-(.*)": "wot-design-uni/components/wd-$1/wd-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "type": "home",
+      "style": {
+        "navigationBarTitleText": "汇景湾物业缴费",
+        "hidesTabBar": true,
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "black"
+      }
+    },
+    {
+      "path": "pages/billList/billList",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "缴物业费"
+      }
+    },
+    {
+      "path": "pages/login/agreement",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "易联服务协议",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/login/changePassword",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "修改密码"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "app-plus": {
+          "splashscreen": {
+            "autoShow": false
+          }
+        }
+      },
+      "layout": "noSideDefault"
+    },
+    {
+      "path": "pages/login/register",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "注册"
+      }
+    },
+    {
+      "path": "pages/login/wxLogin",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "app-plus": {
+          "splashscreen": {
+            "autoShow": false
+          }
+        }
+      },
+      "layout": "noSideDefault"
+    }
+  ],
+  "subPackages": []
+}

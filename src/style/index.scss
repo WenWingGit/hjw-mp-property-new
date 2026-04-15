@@ -1,0 +1,286 @@
+@import './iconfont/iconfont';
+@import './uni';
+@import './wdCostom';
+@import '../theme/default/style/theme.scss';
+
+body,
+html {
+  color: var(--page-title-color);
+}
+
+page {
+  color: var(--page-title-color);
+  background-color: #f7f7f7;
+}
+uni-page-body {
+  color: var(--page-title-color);
+}
+// 高度铺满全屏
+uni-page-body,
+html,
+body {
+  height: 100%;
+}
+.default-page,
+.wot-theme-light,
+.page {
+  min-height: 100%;
+}
+
+:root,
+page {
+  --page-title-color: #040b31;
+
+  // 修改按主题色
+  --primary-color: var(--wot-color-theme);
+  --primary-color-light: #13be7c;
+  --danger-color: #de2e2e;
+  --success-color: #13be7c;
+  --warning-color: #ef8200;
+
+  --com-border-radius: 32rpx;
+}
+// 危险色调
+.danger-color,
+.color-danger {
+  color: var(--danger-color);
+}
+.danger-bg,
+.bg-danger {
+  background-color: var(--danger-color);
+}
+.border-danger,
+.danger-border {
+  border-color: var(--danger-color);
+}
+
+// 警告色调
+.warning-color,
+.color-warning {
+  color: var(--warning-color);
+}
+.warning-bg,
+.bg-warning {
+  background-color: var(--warning-color);
+}
+.border-warning,
+.warning-border {
+  border-color: var(--warning-color);
+}
+
+// 成功色调
+.success-color,
+.color-success {
+  color: var(--success-color);
+}
+.success-bg,
+.bg-success {
+  background-color: var(--success-color);
+}
+.border-success,
+.success-border {
+  border-color: var(--success-color);
+}
+
+// 主色调
+.color-primary,
+.primary-color,
+.color-main {
+  color: var(--primary-color);
+}
+.bg-primary,
+.primary-bg,
+.bg-main {
+  background-color: var(--primary-color);
+}
+.priamry-border,
+.border-primary,
+.main-border {
+  border-color: var(--primary-color);
+}
+
+.hide-parent {
+  position: relative;
+  overflow: hidden;
+}
+.hide-child {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  opacity: 0;
+}
+
+.flex-row,
+.flex-col {
+  display: flex;
+}
+.sx-mx-auto {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.page {
+  width: 100vw;
+  overflow: hidden;
+  background-color: #f7f7f7;
+}
+
+.page-container {
+  width: 710rpx;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.fc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.a-c {
+  align-items: center;
+}
+
+.box-white,
+.white-box {
+  position: relative;
+  box-sizing: border-box;
+  background-color: #fff;
+  border-radius: 20rpx;
+}
+
+.box-white + .box-white,
+.white-box + .white-box {
+  margin-top: 20rpx;
+}
+/* 顶部图片 */
+.page-top-bg {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: -1;
+  width: 100%;
+  transform: translateX(-50%);
+}
+
+// 修改--wot主题
+.color-primary {
+  color: var(--wot-color-theme);
+}
+
+.border-full {
+  border: 2rpx solid #ededed;
+}
+.border-line-top {
+  border-top: 2rpx solid #ededed;
+}
+.border-line-bottom {
+  border-bottom: 2rpx solid #ededed;
+}
+
+.uni-input-placeholder,
+.color-placeholder {
+  color: var(--wot-input-placeholder-color);
+}
+
+textarea,
+uni-input {
+  font-size: 28rpx !important;
+}
+textarea {
+  line-height: 1.5 !important;
+}
+
+// 单行省略，优先使用 unocss: text-ellipsis
+.addDot,
+.ellipsis-1,
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 两行省略
+.text-ov-2,
+.ellipsis-2 {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+// 三行省略
+.text-ov-3,
+.ellipsis-3 {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+// 内容
+.content-row-item {
+  padding: 5rpx 0;
+  &.flex {
+    display: flex;
+    align-items: center;
+    .content-value {
+      display: flex;
+      flex: 1;
+    }
+  }
+  .content-label {
+    display: inline-block;
+    font-size: 30rpx;
+    color: #999999;
+  }
+  .content-value {
+    display: inline;
+    font-size: 30rpx;
+    color: #1a1a1a;
+  }
+  & + .content-row-item {
+    margin-top: 8rpx;
+  }
+}
+
+//
+.item-30 + .item-30 {
+  margin-top: 30rpx;
+}
+
+.item-20 + .item-20 {
+  margin-top: 20rpx;
+}
+
+// 上传
+.upload-box-item {
+  flex: 0 0 calc(50% - 10rpx);
+  margin-bottom: 20rpx;
+}
+.upload-box-item-title {
+  margin-bottom: 20rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+}
+.upload-box-item-desc {
+  margin-bottom: 20rpx;
+  font-size: 26rpx;
+  color: #999;
+}
+/** 标题 */
+.section-title {
+  padding: 20rpx 0;
+  font-size: 32rpx;
+  font-weight: bold;
+}

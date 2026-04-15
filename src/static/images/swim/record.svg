@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30.001" height="34" viewBox="0 0 30.001 34">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#ffd257"/>
+      <stop offset="1" stop-color="#f0313a"/>
+    </linearGradient>
+  </defs>
+  <g id="record" transform="translate(-261.999 -537.001)">
+    <path id="减去_42" data-name="减去 42" d="M8.5,32h0L3.251,28.333-2,32-2,2A4,4,0,0,1,2-2H24a4,4,0,0,1,4,4V32l-5.252-3.667L17.5,32,13,28.333,8.5,32Z" transform="translate(264 539)" fill="url(#linear-gradient)"/>
+    <path id="联合_198" data-name="联合 198" d="M16680,10a1,1,0,1,1,0-2h7.529a1,1,0,0,1,0,2Zm0-4a1,1,0,1,1,0-2h16a1,1,0,1,1,0,2Z" transform="translate(-16411 552)" fill="#fff"/>
+    <path id="联合_200" data-name="联合 200" d="M16682.705,13.239V10.534h-3.3a1,1,0,1,1,0-2h3.3v-1h-3.3a1,1,0,0,1,0-2h2.18l-1-1A1,1,0,0,1,16682,3.12l1.705,1.7,1.7-1.7a1,1,0,0,1,1.416,1.416l-1,1h2.17a1,1,0,0,1,0,2h-3.3v1h3.3a1,1,0,1,1,0,2h-3.3v2.706a1,1,0,1,1-2,0Z" transform="translate(-16406.703 538.76)" fill="#fff"/>
+  </g>
+</svg>

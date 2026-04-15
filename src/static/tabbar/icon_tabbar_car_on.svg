@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="19.816" height="16.359" viewBox="0 0 19.816 16.359">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#7340ff"/>
+      <stop offset="1" stop-color="#1d2088"/>
+    </linearGradient>
+  </defs>
+  <path id="减去_18" data-name="减去 18" d="M6.365,16.359H.258V7.769l1.3-2.394L0,4.611.694,3.194l1.619.795L4.481,0H15.332L17.5,3.993l1.613-.8.7,1.415-1.559.772,1.3,2.387v8.589H13.448V14.465H6.365v1.894ZM11.7,9.346v1.578H15.07V9.346Zm-6.917,0v1.578H8.153V9.346Z" fill="url(#linear-gradient)"/>
+</svg>

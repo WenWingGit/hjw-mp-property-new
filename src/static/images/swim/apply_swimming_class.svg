@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="40.998" height="34.001" viewBox="0 0 40.998 34.001">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#ffd257"/>
+      <stop offset="1" stop-color="#f0313a"/>
+    </linearGradient>
+  </defs>
+  <g id="报名泳班" transform="translate(-256 -414)">
+    <path id="减去_2" data-name="减去 2" d="M16728,31H16697a5.007,5.007,0,0,1-5-5V11h41V26A5.007,5.007,0,0,1,16728,31Zm5-22h-41V5a5.005,5.005,0,0,1,5-5h2V2a5,5,0,1,0,10,0V0h7V2a5,5,0,1,0,10,0V0h2a5.005,5.005,0,0,1,5,5V9Z" transform="translate(-16436 417.002)" fill="url(#linear-gradient)"/>
+    <path id="联合_8" data-name="联合 8" d="M16698.891,10a1,1,0,1,1,0-2h4.354a1,1,0,0,1,0,2Zm-13.771-.9-2.826-2.827a1,1,0,0,1,1.414-1.417l2.121,2.122,4.244-4.24a1,1,0,1,1,1.414,1.409l-4.949,4.953a1.013,1.013,0,0,1-1.418,0Zm13.771-3.1a1,1,0,1,1,0-2h10a1,1,0,1,1,0,2Zm0-4a1,1,0,1,1,0-2h10a1,1,0,1,1,0,2Z" transform="translate(-16418.891 432)" fill="#fff"/>
+    <rect id="矩形_211" data-name="矩形 211" width="8" height="6" rx="3" transform="translate(271 414) rotate(90)" fill="url(#linear-gradient)"/>
+    <rect id="矩形_214" data-name="矩形 214" width="8" height="6" rx="3" transform="translate(288 414) rotate(90)" fill="url(#linear-gradient)"/>
+  </g>
+</svg>

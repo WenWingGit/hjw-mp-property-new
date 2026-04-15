@@ -1,0 +1,235 @@
+:root,
+page {
+  // 修改按主题色
+  --wot-color-theme: #1d2088;
+
+  --wot-button-info-bg-color: #ededed;
+  // 修改按钮背景色
+  --wot-button-primary-bg-color: #1d2088;
+  // --wot-button-large-height: 80rpx !important;
+  // --wot-button-large-padding: 0 64rpx !important;
+  // --wot-button-large-radius: 16rpx !important;
+  // --wot-button-large-fs: 30rpx !important;
+
+  // --wot-button-medium-height: 72rpx !important;
+  // --wot-button-medium-padding: 0 32rpx !important;
+  // --wot-button-medium-fs: 28rpx !important;
+
+  // --wot-button-small-height: 48rpx !important;
+  // --wot-button-small-padding: 0 24rpx !important;
+  // --wot-button-small-fs: 24rpx !important;
+
+  // --wot-input-disabled-color: #999 !important;
+
+  // // swiper
+  // --wot-swiper-radius: 0;
+
+  // // message
+  // --wot-message-box-title-fs: 32rpx !important;
+  // --wot-message-box-content-fs: 28rpx !important;
+  // --wot-message-box-content-max-height: 528rpx !important;
+
+  // --wot-tabs-nav-height: 84rpx !important;
+  // --wot-tabs-nav-fs: 28rpx !important;
+
+  // --wot-input-placeholder-color: #bfbfbf !important;
+}
+
+// .wd-cell__title {
+//   font-size: 28rpx !important;
+// }
+// .wd-cell__wrapper {
+//   padding: 20rpx 30rpx 20rpx 0 !important;
+//   align-items: center !important;
+// }
+// .wd-cell__left {
+//   align-items: center;
+// }
+// .wd-cell__arrow-right {
+//   width: 36rpx !important;
+//   height: 36rpx !important;
+//   font-size: 36rpx !important;
+//   line-height: 36rpx !important;
+// }
+// .wd-cell__value {
+//   font-size: 26rpx !important;
+// }
+// .wd-cell__body {
+//   align-items: center !important;
+// }
+
+// .wd-message-box__title {
+//   line-height: 40rpx !important;
+//   padding-top: 10rpx !important;
+//   padding-bottom: 20rpx !important;
+// }
+// .wd-message-box__content {
+//   line-height: 40rpx !important;
+// }
+// .wd-message-box__actions {
+//   padding: 48rpx !important;
+// }
+
+// .wd-button.is-medium.is-round {
+//   min-width: 240rpx !important;
+// }
+// .wd-tabs__line {
+//   bottom: 8rpx !important;
+//   border-radius: 10rpx !important;
+// }
+
+// .wd-input .wd-icon-view,
+// .wd-input .wd-icon-eye-close {
+//   font-size: 28rpx !important;
+// }
+
+// .wd-segmented {
+//   padding: 20rpx 20rpx 0 !important;
+//   border-radius: 16rpx 16rpx 0 0 !important;
+// }
+// .wd-segmented__item--active {
+//   border-radius: 16rpx 16rpx 0 0 !important;
+//   height: calc(100% - var(--wot-segmented-padding, 4px)) !important;
+// }
+
+// .wd-segmented__item {
+//   font-size: 32rpx !important;
+//   min-height: 80rpx !important;
+//   line-height: 80rpx !important;
+// }
+
+// // input
+
+// .wd-input__label-inner {
+//   font-size: 28rpx !important;
+//   line-height: 1 !important;
+// }
+
+// .bg-input .wd-input.is-cell {
+//   align-items: center !important;
+// }
+
+// .wd-input__value,
+// .wd-input__body {
+//   height: 100% !important;
+// }
+
+// // bg-input
+// .bg-input .wd-input::after {
+//   display: none !important;
+// }
+// .bg-input .wd-input {
+//   background-color: transparent !important;
+//   width: 100% !important;
+//   box-sizing: border-box !important;
+//   padding: 0 30rpx !important;
+// }
+// .bg-input {
+//   display: flex;
+//   align-items: center;
+//   width: 100%;
+//   height: 75rpx;
+//   background: #f7f7f7;
+//   border-radius: 14rpx 14rpx 14rpx 14rpx;
+// }
+// .bg-input + .bg-input {
+//   margin-top: 25rpx;
+// }
+
+// .bg-textarea {
+//   width: 100%;
+//   height: 300rpx;
+//   background: #f7f7f7;
+//   border-radius: 14rpx 14rpx 14rpx 14rpx;
+// }
+
+// .bg-textarea .wd-textarea__value,
+// .bg-textarea .wd-textarea {
+//   height: 100%;
+//   background-color: transparent !important;
+// }
+
+// .wd-picker__cell .wd-picker__value {
+//   font-size: 30rpx !important;
+// }
+// .wd-picker__arrow {
+//   font-size: 32rpx !important;
+// }
+
+// // 步进器
+// .wd-input-number__action {
+//   width: 52rpx !important;
+//   height: 52rpx !important;
+// }
+// .wd-input-number__action::after {
+//   width: calc(200% - 2px) !important;
+//   height: calc(200% - 2px) !important;
+//   border: 0 !important;
+//   border-radius: 50% !important;
+// }
+// .wd-input-number__input {
+//   width: 72rpx !important;
+//   height: 52rpx !important;
+// }
+// .wd-input-number__input-border {
+//   border-top: 0 !important;
+//   border-bottom: 0 !important;
+// }
+// .wd-input-number__action:nth-of-type(1) {
+//   background: #cccccc !important;
+//   border-radius: 50% !important;
+// }
+// .wd-input-number__action ~ .wd-input-number__action {
+//   background: #1d2088 !important;
+//   border-radius: 50% !important;
+// }
+// .wd-input-number__action-icon {
+//   font-size: 28rpx !important;
+//   width: 28rpx !important;
+//   height: 28rpx !important;
+//   color: #fff;
+// }
+
+// // 下拉
+// .wd-drop-menu {
+//   --wot-drop-menu-fs: 30rpx !important;
+// }
+
+// .wd-picker__label {
+//   font-size: 28rpx !important;
+// }
+
+// // 多项选择器
+// .wd-col-picker__list-item {
+//   justify-content: space-between !important;
+// }
+// .page-form-picker .wd-col-picker__cell {
+//   padding-right: 0 !important;
+// }
+
+// .bg-textarea .wd-textarea__inner {
+//   height: 100% !important;
+// }
+
+// .radio-readonly .wd-radio-group {
+//   position: relative;
+//   pointer-events: none !important;
+// }
+
+// .wd-col-picker__list-item > view:nth-of-type(1) {
+//   flex: 1 !important;
+// }
+// .wd-radio-group {
+//   background-color: transparent !important;
+// }
+// .wd-col-picker__list-item-label {
+//   text-align: left;
+// }
+
+// .picker-title-bold .wd-picker__label {
+//   font-weight: bold !important;
+// }
+
+.wd-message-box__flex {
+  justify-content: center;
+}

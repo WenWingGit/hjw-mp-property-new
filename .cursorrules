@@ -1,0 +1,269 @@
+# 租车小程序的界面 - 智能代码提示增强配置
+# Vue3 + uni-app + TypeScript 项目
+优先使用简体字，是单语言项目
+项目用rpx做单位
+## 项目结构和导入路径
+### 路径别名配置
+- @/ 指向 src/
+- @/components/ 指向 src/components/
+- @/utils/ 指向 src/utils/
+- @/hooks/ 指向 src/hooks/
+- @/service/ 指向 src/service/
+- @/types/ 指向 src/types/
+- @/store/ 指向 src/store/
+
+### 导入优先级规则
+1. 优先推荐项目内已封装的功能
+2. 推荐uni-app官方API
+3. 推荐Vue3 Composition API
+4. 推荐wot-design-uni组件库
+5. 最后推荐第三方库
+
+## 核心工具函数库 (src/utils/)
+### 路由和URL处理
+```typescript
+// obj2Url - 对象转URL参数
+obj2Url(obj: object, isEncode: boolean): string
+// 使用示例：obj2Url({name: '张三', age: 25}, true)
+
+// getUrlObj - 解析URL获取path和query
+getUrlObj(url: string): {path: string, query: Record<string, string>}
+// 使用示例：getUrlObj('/pages/login?redirect=%2Fpages%2Fhome')
+
+// currRoute - 获取当前页面路由信息
+currRoute(): {path: string, query: Record<string, string>}
+
+// navToLogin - 跳转到登录页
+navToLogin(): void
+
+// navToHome - 跳转到首页  
+navToHome(): void
+
+// getIsTabbar - 判断当前是否为tabbar页面
+getIsTabbar(): boolean
+
+// getAllPages - 获取所有页面配置
+getAllPages(key?: string): Array<{path: string, [key: string]: any}>
+
+// getNeedLoginPages - 获取需要登录的页面路径
+getNeedLoginPages(): string[]
+```
+
+### HTTP请求工具 (src/utils/http.ts)
+```typescript
+// 统一的HTTP请求封装，自动添加token和错误处理
+import { http } from '@/utils/http'
+// GET请求：http.get(url, params)
+// POST请求：http.post(url, data)  
+// PUT请求：http.put(url, data)
+// DELETE请求：http.delete(url, params)
+```
+
+### 存储工具 (src/utils/storage.ts)
+```typescript
+// 本地存储封装，支持过期时间
+import { setStorage, getStorage, removeStorage } from '@/utils/storage'
+```
+
+## 核心Hooks库 (src/hooks/)
+### 文件上传相关
+```typescript
+// useUpload - 图片上传hook
+import useUpload from '@/hooks/useUpload'
+const { loading, error, data, run } = useUpload<string>(
+  formData?: Record<string, any>,
+  accept?: 'image' | 'video', 
+  count?: number
+)
+
+// useUploadVideo - 视频上传hook  
+import { useUploadVideo } from '@/hooks/useUpload'
+const { loading, error, data, run } = useUploadVideo<string>(formData?, count?)
+
+// useUploadFile - 文件上传hook
+import useUploadFile from '@/hooks/useUploadFile'
+const { loading, error, data, run } = useUploadFile<string>()
+```
+
+### 数据请求相关
+```typescript
+// useRequest - 请求封装hook
+import useRequest from '@/hooks/useRequest'
+const { loading, error, data, run } = useRequest(requestFn, options?)
+```
+
+### UI交互相关
+```typescript
+// useLockScroll - 锁定滚动
+import useLockScroll from '@/hooks/useLockScroll'
+const { lock, unlock } = useLockScroll()
+
+// useExpandState - 展开/收起状态
+import useExpandState from '@/hooks/useExpandState'
+const { expanded, toggle, expand, collapse } = useExpandState(defaultValue?)
+
+// useDomRect - 获取DOM元素尺寸信息
+import useDomRect from '@/hooks/useDomRect'
+const { rect, update } = useDomRect(selector)
+```
+
+### 业务逻辑相关
+```typescript
+// useSendCode - 发送验证码
+import useSendCode from '@/hooks/useSendCode'
+const { loading, countdown, canSend, sendCode } = useSendCode()
+
+// useUserPermission - 用户权限
+import useUserPermission from '@/hooks/useUserPermission'  
+const { hasPermission, checkPermission } = useUserPermission()
+
+// useStorage - 响应式存储
+import useStorage from '@/hooks/useStorage'
+const [value, setValue] = useStorage(key, defaultValue)
+```
+
+## 核心组件库 (src/components/)
+### 通用组件 (src/components/common/)
+```vue
+
+```
+
+### 业务组件使用规范
+- 所有业务组件都应该有明确的props类型定义
+- 事件命名使用kebab-case格式
+- 组件名使用PascalCase格式
+- 优先使用项目内组件，再考虑wot-design-uni组件
+
+## API Service调用规范 (src/service/)
+### 按业务模块组织
+```typescript
+
+```
+
+### API调用模式
+```typescript
+
+// 直接调用
+try {
+  const result = await carService.getCarList(params)
+  // 处理结果
+} catch (error) {
+  // 错误处理
+}
+```
+
+## 页面开发模板
+### 标准页面结构
+```vue
+<template>
+  <view class="page-container">
+    <!-- 导航栏 -->
+    <PageNavBar :title="页面标题" @back="handleBack" />
+    
+    <!-- 页面内容 -->
+    <view class="page-content">
+      <!-- 具体内容 -->
+    </view>
+  </view>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRequest } from '@/hooks/useRequest'
+import * as xxxService from '@/service/xxx'
+
+// 页面数据
+const loading = ref(false)
+const list = ref([])
+
+// API请求
+const { loading: apiLoading, run: loadData } = useRequest(() => 
+  xxxService.getList()
+)
+
+// 页面方法
+const handleBack = () => {
+  uni.navigateBack()
+}
+
+// 页面生命周期
+onMounted(() => {
+  loadData()
+})
+</script>
+
+<style scoped>
+.page-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.page-content {
+  padding: 20rpx;
+}
+</style>
+```
+
+## 开发最佳实践
+### TypeScript使用规范
+- 所有变量必须明确类型
+- 接口定义放在types目录
+- API返回值使用泛型约束
+- 组件props使用TypeScript定义
+
+### 性能优化建议
+- 长列表使用虚拟滚动
+- 图片使用懒加载
+- 合理使用computed和watch
+- 避免在模板中使用复杂表达式
+
+### 错误处理规范
+```typescript
+// 统一错误处理
+try {
+  const result = await apiCall()
+  // 成功处理
+} catch (error) {
+  console.error('API调用失败:', error)
+  uni.showToast({
+    title: '操作失败，请重试',
+    icon: 'none'
+  })
+}
+```
+
+### 样式开发规范
+- 使用UnoCSS原子化样式
+- 响应式单位使用rpx
+- 主题色使用CSS变量
+- 组件样式使用scoped
+
+## 代码生成优先级
+1. **导入语句**：优先推荐项目内模块
+2. **函数调用**：优先推荐已封装的工具函数
+3. **组件使用**：优先推荐项目内组件
+4. **API调用**：优先推荐service层接口
+5. **样式类名**：优先推荐UnoCSS类名
+
+## 智能提示触发条件
+- 输入import时，优先提示项目内模块
+- 输入@/时，显示路径别名提示
+- 输入use时，优先提示项目内hooks
+- 在<template>中，优先提示项目内组件
+- 在方法中，优先提示工具函数
+
+## 特殊场景处理
+### uni-app特有API
+- 优先推荐uni.方法而不是wx.方法
+- 跨平台兼容性检查
+- 条件编译语法支持
+
+### Vue3 Composition API
+- 优先推荐组合式API
+- 响应式数据使用ref/reactive
+- 生命周期使用onMounted等
+
+### 项目特定业务逻辑
+- 登录状态检查使用项目内方法
+- 路由跳转使用封装的导航函数
+- 文件上传使用项目内hooks

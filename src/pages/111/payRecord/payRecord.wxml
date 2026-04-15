@@ -1,0 +1,75 @@
+<!--pages/index/payFees/payRecord/payRecord.wxml-->
+<layout id="layout" pb="0" no-safe-area bg-color="#fff" show-bg-top>
+  <nav-top-bar 
+    is-show-back 
+    is-show-home
+    title="充值记录" 
+    title-color="var(--page-font-color)" 
+    btn-theme="black"
+  >
+  </nav-top-bar>
+
+  <!-- 历史缴费记录 -->
+  <scroll-view
+    class="mt-15"
+    style="height:calc(100vh - 15rpx - {{nav_style.total_height}});"
+    scroll-y
+    refresher-enabled
+    refresher-triggered="{{is_refreshing}}"
+    bindrefresherrefresh="handleRefresh"
+    bindscrolltolower="handleScrollToBottom"
+  >
+    <view class="page-container pb-40">
+
+      <view 
+        class="box-white p-30 item-30" 
+        wx:for="{{ pay_record_list }}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        data-page_index="{{item.page_index}}"
+        bind:tap="onClickItem"
+      >
+        <view class="flex j-s a-c">
+          <view class="record-title">充值金额：{{ item.amountStr }}</view>
+          <view class="status status-{{item.applyStatus}}">{{ item.applyStatusStr }}</view>
+        </view>
+        <view class="Infobox p-30 mt-30">
+          <view class="record-text">
+            <view>业主：</view>
+            <view>{{ item.payUserName }}</view>
+          </view>
+          <view class="record-text">
+            <view>业主手机号：</view>
+            <view>{{ item.payUserMappingPhone }}</view>
+          </view>
+          <view class="record-text">
+            <view>业主小区：</view>
+            <view>{{ item.houseStr }}</view>
+          </view>
+          <view class="record-text">
+            <view>提交时间：</view>
+            <view>{{ item.createdTime }}</view>
+          </view>
+          <block wx:if="{{item.discount > 0}}">        
+            <view class="record-text">
+              <view>折扣：</view>
+              <view>{{ item.discountStr }}</view>
+            </view>
+            <view class="record-text">
+              <view>折扣后金额：</view>
+              <view>{{ item.discountedAmountStr }}</view>
+            </view>
+          </block>
+        </view>
+        <view wx:if="{{item.auditRemark}}" class="flex record-recevier mt-30">
+          审核备注：{{ item.auditRemark }}
+        </view>
+      </view>
+
+      <page-info page-info="{{ page_info }}" />      
+    </view>
+
+  </scroll-view>
+
+
+</layout>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+  <g id="组_3428" data-name="组 3428" transform="translate(-27 -1483)">
+    <g id="矩形_836" data-name="矩形 836" transform="translate(29 1486)" fill="none" stroke="#de2e2e" stroke-width="1.5">
+      <path d="M0,0H14a0,0,0,0,1,0,0V12a3,3,0,0,1-3,3H3a3,3,0,0,1-3-3V0A0,0,0,0,1,0,0Z" stroke="none"/>
+      <path d="M.75.75h12.5a0,0,0,0,1,0,0V12A2.25,2.25,0,0,1,11,14.25H3A2.25,2.25,0,0,1,.75,12V.75A0,0,0,0,1,.75.75Z" fill="none"/>
+    </g>
+    <rect id="矩形_847" data-name="矩形 847" width="8" height="1.5" rx="0.75" transform="translate(34.75 1488.75) rotate(90)" fill="#de2e2e"/>
+    <rect id="矩形_886" data-name="矩形 886" width="8" height="1.5" rx="0.75" transform="translate(38.75 1488.75) rotate(90)" fill="#de2e2e"/>
+    <rect id="矩形_887" data-name="矩形 887" width="18" height="1.5" rx="0.75" transform="translate(45 1487.5) rotate(180)" fill="#de2e2e"/>
+    <rect id="矩形_888" data-name="矩形 888" width="10" height="1.5" rx="0.75" transform="translate(41 1484.5) rotate(180)" fill="#de2e2e"/>
+  </g>
+</svg>
