@@ -1,0 +1,12 @@
+import type * as tsTypes from 'typescript';
+import type { UniXCompiler, UniXCompilerOptions } from '../../lib/uni-x/dist/compiler';
+export type { UniXCompiler } from '../../lib/uni-x/dist/compiler';
+type TargetLanguage = `${UniXCompilerOptions['targetLanguage']}`;
+export declare function createUniXCompiler(mode: UniXCompilerOptions['mode'], targetLanguage: TargetLanguage, options: {
+    inputDir: string;
+    outputDir: string;
+    cacheDir: string;
+    paths?: tsTypes.CompilerOptions['paths'];
+    rootFiles?: string[];
+    normalizeFileName: (str: string) => string;
+}): UniXCompiler;

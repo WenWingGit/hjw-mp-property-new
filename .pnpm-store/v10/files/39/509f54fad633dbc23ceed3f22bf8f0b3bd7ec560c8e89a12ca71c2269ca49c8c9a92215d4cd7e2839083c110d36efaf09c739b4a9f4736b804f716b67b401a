@@ -1,0 +1,49 @@
+{
+  "name": "unocss-applet",
+  "type": "module",
+  "version": "0.7.8",
+  "description": "",
+  "author": "Neil Lee <zguolee@foxmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/unocss-applet/unocss-applet#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unocss-applet/unocss-applet.git"
+  },
+  "bugs": "https://github.com/unocss-applet/unocss-applet/issues",
+  "keywords": [
+    "unocss",
+    "uni-app",
+    "atomic-css",
+    "atomic-css-engine",
+    "css",
+    "tailwind",
+    "windicss"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./*": "./*"
+  },
+  "main": "dist/index.cjs",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@unocss-applet/transformer-applet": "^0.5.5",
+    "@unocss/preset-uno": "^0.56.5",
+    "@unocss-applet/preset-applet": "0.7.8",
+    "@unocss-applet/preset-rem-rpx": "0.7.8",
+    "@unocss-applet/transformer-attributify": "0.7.8"
+  },
+  "scripts": {
+    "build": "unbuild",
+    "stub": "unbuild --stub"
+  },
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts"
+}

@@ -1,0 +1,185 @@
+import { UniNativeColor } from './UniNativeDefines'
+import { UniCSSPropertyID, UniCSSPropertyName } from './UniCSSProperty'
+import { UniNativeLayout, UniNativePaddings, UniNativePadding } from './UniNativeDefines'
+import { UniNativeBorders, UniNativeBorder, UniNativeBorderStyles, UniNativeBorderStyle, UniNativeBorderWidths, UniNativeBorderWidth, UniNativeBorderColors, UniNativeBorderColor, UniNativeBorderRadiuses, UniNativeBorderRadius } from './UniNativeDefines'
+import { UniNativeBoxShadow, UniNativeOverflowType, UniNativeDisplayType, UniNativePointerEventType, UniNativePositionType, UniNativeVisibilityType } from './UniNativeDefines'
+import { UniNativeSlotType } from './UniNativeDefines'
+
+
+
+/**
+ * 原生基础View
+ */
+export interface UniNativeBaseView {
+
+  /**
+   * 扩展数据
+   *  提供给vue框架使用
+   */
+  ext: Map<string, any | null>
+
+  /**
+   * 插槽名称
+   *  默认为UniNativeSlotType.none，提供给特定场景（如自定义下拉刷新）使用
+   */
+  slot: UniNativeSlotType
+
+  /**
+   * 获取内部ID值，用于框架调用，不对外公开
+   *  Android平台在kotlin层实现
+   *  鸿蒙/iOS平台在c层实现
+   */
+  getNodeId(): number
+
+  /**
+   * 获取渲染相关
+   * 子类需根据支持的样式重写
+   */
+  /**
+   * 获取字符串格式样式
+   */
+  getStyleString(key: UniCSSPropertyID|UniCSSPropertyName): string|null
+  /**
+   * 获取类型化样式
+   */
+  getStyleAny(key: UniCSSPropertyID|UniCSSPropertyName): any|null
+
+
+  /**
+   * 位置相关
+   * 坐标相对于父View
+   */
+  /**
+   * 设置显示信息
+   */
+  layout(value: UniNativeLayout): UniNativeBaseView
+  layout(left:number, top: number, width: number, height: number ): UniNativeBaseView
+
+  /**
+   * 设置内边距
+   *    value为UniNativePadding类型表示设置所有内边距值都相同
+   */
+  padding(value: UniNativePaddings|UniNativePadding): UniNativeBaseView
+  paddingTop(value: UniNativePadding): UniNativeBaseView
+  paddingRight(value: UniNativePadding): UniNativeBaseView
+  paddingBottom(value: UniNativePadding): UniNativeBaseView
+  paddingLeft(value: UniNativePadding): UniNativeBaseView
+
+  /**
+   * 边框相关
+   */
+  /**
+   * 设置完整边框
+   */
+  border(value: UniNativeBorders): UniNativeBaseView
+  borderTop(value: UniNativeBorder): UniNativeBaseView
+  borderRight(value: UniNativeBorder): UniNativeBaseView
+  borderBottom(value: UniNativeBorder): UniNativeBaseView
+  borderLeft(value: UniNativeBorder): UniNativeBaseView
+  /**
+   * 设置边框样式
+   */
+  borderStyle(value: UniNativeBorderStyles|UniNativeBorderStyle): UniNativeBaseView
+  borderStyleTop(value: UniNativeBorderStyle): UniNativeBaseView
+  borderStyleRight(value: UniNativeBorderStyle): UniNativeBaseView
+  borderStyleBottom(value: UniNativeBorderStyle): UniNativeBaseView
+  borderStyleLeft(value: UniNativeBorderStyle): UniNativeBaseView
+  /**
+   * 设置边框宽度
+   */
+  borderWidth(value: UniNativeBorderWidths|UniNativeBorderWidth): UniNativeBaseView
+  borderWidthTop(value: UniNativeBorderWidth): UniNativeBaseView
+  borderWidthRight(value: UniNativeBorderWidth): UniNativeBaseView
+  borderWidthBottom(value: UniNativeBorderWidth): UniNativeBaseView
+  borderWidthLeft(value: UniNativeBorderWidth): UniNativeBaseView
+  /**
+   * 设置边框颜色
+   */
+  borderColor(value: UniNativeBorderColors|UniNativeBorderColor): UniNativeBaseView
+  borderColorTop(value: UniNativeBorderColor): UniNativeBaseView
+  borderColorRight(value: UniNativeBorderColor): UniNativeBaseView
+  borderColorBottom(value: UniNativeBorderColor): UniNativeBaseView
+  borderColorLeft(value: UniNativeBorderColor): UniNativeBaseView
+  /**
+   * 设置边框圆角
+   */
+  borderRadius(value: UniNativeBorderRadiuses|UniNativeBorderRadius): UniNativeBaseView
+  borderRadiusTopLeft(horizontal: UniNativeBorderRadius, vertical: UniNativeBorderRadius): UniNativeBaseView
+  borderRadiusTopRight(horizontal: UniNativeBorderRadius, vertical: UniNativeBorderRadius): UniNativeBaseView
+  borderRadiusBottomLeft(horizontal: UniNativeBorderRadius, vertical: UniNativeBorderRadius): UniNativeBaseView
+  borderRadiusBottomRight(horizontal: UniNativeBorderRadius, vertical: UniNativeBorderRadius): UniNativeBaseView
+
+  /**
+   * 背景相关
+   */
+  /**
+   * 设置背景颜色
+   * 设置为null表示无背景色，默认无背景色
+   */
+  backgroundColor(value: UniNativeColor|null): UniNativeBaseView
+
+  /**
+   * CSS: box-shadow
+   * 设置阴影
+   * 设置为null表示不需要阴影，默认无阴影
+   */
+  boxShadow(value: UniNativeBoxShadow|null): UniNativeBaseView
+
+  /**
+   * CSS: display
+   * 设置显示类型
+   */
+  display(value: UniNativeDisplayType): UniNativeBaseView
+
+  /**
+   * CSS: opacity
+   * 设置不透明度
+   * 取值范围为0~1.0，默认值为1，即完全不透明
+   */
+  opacity(value: number): UniNativeBaseView
+
+  /**
+   * CSS: overflow
+   * 设置元素溢出行为
+   * 默认溢出裁剪
+   */
+  overflow(value: UniNativeOverflowType): UniNativeBaseView
+
+  /**
+   * CSS: pointer-events
+   * 元素是否可以成为事件的target
+   * 默认可成为事件的target
+   */
+  pointerEvents(value: UniNativePointerEventType): UniNativeBaseView
+
+  /**
+   * CSS: position
+   */
+  position(value: UniNativePositionType): UniNativeBaseView
+
+  /**
+   * CSS: visibility
+   * 元素是否可见
+   * 默认可见
+   */
+  visibility(value: UniNativeVisibilityType): UniNativeBaseView
+
+  /**
+   * CSS: z-index
+   * 设置z轴顺序
+   */
+  zIndex(value: number): UniNativeBaseView
+
+  /**
+   * CSS: transform
+   * //Todo...
+   */
+  transform(): UniNativeBaseView
+
+  /**
+   * CSS: transition
+   * //Todo...
+   */
+  transition(): UniNativeBaseView
+}
+

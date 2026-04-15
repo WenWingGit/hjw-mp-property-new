@@ -1,0 +1,10 @@
+import type { RPT2Options } from 'rollup-plugin-typescript2';
+interface UTS2JavaScriptOptions extends Omit<RPT2Options, 'transformers'> {
+    inputDir: string;
+    version: string;
+    modules: Record<string, any>;
+    sourceMap?: boolean;
+}
+type uts2js = (options: UTS2JavaScriptOptions) => import('rollup').Plugin[];
+export declare const uts2js: uts2js;
+export {};

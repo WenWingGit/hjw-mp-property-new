@@ -1,0 +1,16 @@
+import * as _unocss_core from '@unocss/core';
+
+interface LegacyCompatOptions {
+    /**
+     * Convert modern space style color function to comma style.
+     *
+     * @example `rgb(255 0 0)` -> `rgb(255, 0, 0)`
+     * @example `rgba(255 0 0 / 0.5)` -> `rgba(255, 0, 0, 0.5)`
+     *
+     * @default false
+     */
+    commaStyleColorFunction?: boolean;
+}
+declare const presetLegacyCompat: _unocss_core.PresetFactory<object, LegacyCompatOptions>;
+
+export { type LegacyCompatOptions, presetLegacyCompat as default, presetLegacyCompat };

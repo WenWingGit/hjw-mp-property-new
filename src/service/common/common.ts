@@ -225,3 +225,21 @@ export const submitPropertyRechargeApi = (params: any) => {
 export const getQrCodeApi = () => {
   return http.get<any>('/WxMinApi/WebUser/GetQrCode')
 }
+
+/**
+ * 获取物业充值记录列表
+ * @param params
+ * @returns
+ */
+export const getPropertyRechargeListApi = (params: any) => {
+  return http.get<any>('/WxMinApi/RechargeApply/GetPropertyRechargeList', params)
+}
+
+/**
+ * 获取物业支付记录列表
+ * @param params
+ * @returns
+ */
+export const getPropertyPaymentListApi = (params: any) => {
+  return http.get<any>('/WxMinApi/Payment/GetPropertyPaymentList', params)
+}

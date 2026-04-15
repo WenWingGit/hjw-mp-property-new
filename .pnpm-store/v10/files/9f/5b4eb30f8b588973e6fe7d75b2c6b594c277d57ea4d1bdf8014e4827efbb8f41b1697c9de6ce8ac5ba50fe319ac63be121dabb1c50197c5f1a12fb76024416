@@ -1,0 +1,71 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve, parse, dirname } from 'node:path';
+import { inputDir, isApp, platform, isMp } from '@uni-helper/uni-env';
+import { normalizePath } from 'vite';
+import * as uniUtils from '@dcloudio/uni-cli-shared/dist/utils.js';
+import * as uniResolve from '@dcloudio/uni-cli-shared/dist/resolve.js';
+import * as constants from '@dcloudio/uni-cli-shared/dist/constants.js';
+
+uniUtils.normalizePagePath = function(pagePath, platform2) {
+  const absolutePagePath = resolve(inputDir, pagePath);
+  let extensions = constants.PAGE_EXTNAME;
+  if (isApp)
+    extensions = constants.PAGE_EXTNAME_APP;
+  for (let i = 0; i < extensions.length; i++) {
+    const extname = extensions[i];
+    if (existsSync(absolutePagePath + extname))
+      return pagePath + extname;
+    const withPlatform = `${absolutePagePath}.${platform2}${extname}`;
+    if (existsSync(withPlatform))
+      return pagePath + extname;
+  }
+  console.error(`${pagePath} not found`);
+};
+const requireResolve = uniResolve.requireResolve;
+uniResolve.requireResolve = function(filename, basedir) {
+  try {
+    return requireResolve(filename, basedir);
+  } catch (error) {
+    const { ext, base, dir } = parse(filename);
+    filename = `${dir}/${base}.${platform}${ext ? `.${ext}` : ""}`;
+    return requireResolve(filename, basedir);
+  }
+};
+
+function VitePluginUniPlatform() {
+  return {
+    name: "vite-plugin-uni-platform",
+    enforce: "pre",
+    async resolveId(source, importer, options) {
+      if (source.includes(`.${platform}`))
+        return null;
+      const sourceResolution = await this.resolve(source, importer, {
+        ...options,
+        skipSelf: true
+        // 避免无限循环
+      });
+      if (sourceResolution)
+        return null;
+      const platformSource = source.replace(/(.*)\.(.*)$/, `$1.${platform}.$2`);
+      const resolution = await this.resolve(platformSource, importer, { ...options, skipSelf: true });
+      if (!resolution || resolution.external)
+        return resolution;
+      const sourceId = normalizePath(resolve(dirname(importer), source));
+      const isVue = resolution.id.endsWith("vue");
+      return isMp && isVue ? sourceId : resolution;
+    },
+    // 自定义加载器，尝试将所有不带 {platform} 后缀的文件拼接 {platform} 后去加载
+    async load(id) {
+      let platformId = id;
+      if (!id.includes(`.${platform}`))
+        platformId = id.replace(/(.*)\.(.*)$/, `$1.${platform}.$2`);
+      if (platformId && platformId !== id && existsSync(platformId)) {
+        return readFileSync(platformId, {
+          encoding: "utf-8"
+        });
+      }
+    }
+  };
+}
+
+export { VitePluginUniPlatform, VitePluginUniPlatform as default };

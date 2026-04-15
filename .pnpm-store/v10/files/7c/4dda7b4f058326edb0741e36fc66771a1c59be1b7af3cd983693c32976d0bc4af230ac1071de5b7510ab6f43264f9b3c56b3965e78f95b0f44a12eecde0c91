@@ -1,0 +1,354 @@
+import { UniPage } from './index'
+import { UniElementStyles } from './UniElementType'
+import { UniCSSPropertyID, UniCSSPropertyName, UniCSSPropertyValue } from './UniCSSProperty'
+import { UniCSSUnitType, UniCSSUnitValue } from './UniCSSType'
+import { UniCSSBoxSizingType, UniCSSDisplayType, UniCSSPositionType, UniCSSVisibilityType, UniCSSBorderStyleType } from './UniCSSProperty'
+import { UniCSSFlexDirectionType, UniCSSFlexWrapType, UniCSSJustifyContentType, UniCSSAlignItemsType, UniCSSAlignSelfType, UniCSSAlignContentType } from './UniCSSProperty'
+
+declare global {
+  /**
+   * UniElement
+   */
+  interface UniElement {
+
+    /**
+     * 以下属性在FlexNode和DOM层封装
+     * - Android平台：c层和kt层都需要封装
+     * - iOS平台：oc层实现
+     * - 鸿蒙平台：c层实现
+     */
+    /**
+     * 元素的标签名
+     */
+    readonly tagName: string
+    readonly nodeName: string   //用于向下兼容
+    /**
+     * 元素的父元素对象
+     */
+    readonly parentElement: UniElement | null
+    /**
+     * 元素包含的子元素的集合
+     */
+    readonly children: UniElement[]
+    /**
+     * 元素包含的第一个子元素
+     */
+    readonly firstElementChild: UniElement | null
+    readonly firstChild: UniElement | null  //用于向下兼容
+    /**
+     * 元素包含的最后一个子元素
+     */
+    readonly lastElementChild: UniElement | null
+    readonly lastChild: UniElement | null   //用于向下兼容
+    /**
+     * 元素在其父元素的子元素节点中的前一个元素节点
+     */
+    readonly previousElementSibling: UniElement | null
+    readonly previousSibling: UniElement | null   //用于向下兼容
+    /**
+     * 元素在其父元素的子元素节点中的后一个元素节点
+     */
+    readonly nextElementSibling: UniElement | null
+    readonly nextSibling: UniElement | null     //用于向下兼容
+
+    /**
+     * 以下属性在DOM层封装实现
+     * - Android平台：kotlin层实现
+     * - iOS平台：oc层实现
+     * - 鸿蒙平台：c层实现
+     */
+    /**
+     * 元素的标识符，对应组件上的id属性
+     *  默认值为空字符串
+     */
+    id: string
+    /**
+     * class属性值的集合
+     *  提供给VUE框架保存class name信息
+     */
+    classList: string[]
+    /**
+     * 元素是否与DOM树连接
+     */
+    readonly isConnected: boolean
+    /**
+     * 元素所属页面对象
+     */
+    readonly uniPage: UniPage
+    /**
+     * 元素相对于父元素的位置信息
+     */
+    readonly offsetLeft: number
+    readonly offsetTop: number
+    /**
+     * 元素的布局信息
+     */
+    readonly offsetWidth: number
+    readonly offsetHeight: number
+    /**
+     * 获取或修改元素滚动条到元素左边的距离
+     */
+    scrollLeft: number
+    /**
+     * 获取或修改元素滚动条到元素顶部的距离
+     */
+    scrollTop: number
+    /**
+     * 元素内容宽度
+     */
+    readonly scrollWidth: number
+    /**
+     * 元素内容高度
+     */
+    readonly scrollHeight: number
+    /**
+     * 元素的所有属性集合
+     */
+    readonly attributes: Map<string, any | null>
+    /**
+     * 自定义数据属性（data-*）的集合
+     */
+    readonly dataset: Map<string, any | null>
+    /**
+     * 扩展数据
+     *  提供给vue框架使用
+     */
+    ext: Map<string, any | null>
+
+    /**
+     * 以下方法在FlexNode层封装，仅用于内部使用
+     * - Android平台：c层实现
+     * - iOS平台：oc层实现
+     * - 鸿蒙平台：c层实现
+     */
+    /**
+     * 定义CSS变量
+     * @param key - css变量名称
+     * @param value - css变量值，空字符串则表示移除变量定义
+     */
+    defineStyleVariable(key: string, value: string): void
+    /**
+     * 设置CSS变量
+     */
+    setStyleVariable(key: UniCSSPropertyID, value: string): void
+    /**
+     * 设置位置大小相关CSS属性
+     */
+    setStyleBoxSizing(value: UniCSSBoxSizingType): void
+    getStyleBoxSizing(): UniCSSBoxSizingType
+    setStyleDisplay(value: UniCSSDisplayType): void
+    getStyleDisplay(): UniCSSDisplayType
+    setStylePosition(value: UniCSSPositionType): void
+    getStylePosition(): UniCSSPositionType
+    setStyleWidth(value: UniCSSUnitValue): void
+    setStyleWidth(value: number, unit: UniCSSUnitType): void
+    getStyleWidth(): UniCSSUnitValue
+    setStyleHeight(value: UniCSSUnitValue): void
+    setStyleHeight(value: number, unit: UniCSSUnitType): void
+    getStyleHeight(): UniCSSUnitValue
+    setStyleMinWidth(value: UniCSSUnitValue): void
+    setStyleMinWidth(value: number, unit: UniCSSUnitType): void
+    getStyleMinWidth(): UniCSSUnitValue
+    setStyleMinHeight(value: UniCSSUnitValue): void
+    setStyleMinHeight(value: number, unit: UniCSSUnitType): void
+    getStyleMinHeight(): UniCSSUnitValue
+    setStyleMaxWidth(value: UniCSSUnitValue): void
+    setStyleMaxWidth(value: number, unit: UniCSSUnitType): void
+    getStyleMaxWidth(): UniCSSUnitValue
+    setStyleMaxHeight(value: UniCSSUnitValue): void
+    setStyleMaxHeight(value: number, unit: UniCSSUnitType): void
+    getStyleMaxHeight(): UniCSSUnitValue
+    setStyleTop(value: UniCSSUnitValue): void
+    setStyleTop(value: number, unit: UniCSSUnitType): void
+    getStyleTop(): UniCSSUnitValue
+    setStyleRight(value: UniCSSUnitValue): void
+    setStyleRight(value: number, unit: UniCSSUnitType): void
+    getStyleRight(): UniCSSUnitValue
+    setStyleBottom(value: UniCSSUnitValue): void
+    setStyleBottom(value: number, unit: UniCSSUnitType): void
+    getStyleBottom(): UniCSSUnitValue
+    setStyleLeft(value: UniCSSUnitValue): void
+    setStyleLeft(value: number, unit: UniCSSUnitType): void
+    getStyleLeft(): UniCSSUnitValue
+    setStyleVisibility(value: UniCSSVisibilityType): void
+    getStyleVisibility(): UniCSSVisibilityType
+    /**
+     * 设置边框边距相关CSS属性
+     */
+    setStyleMargin(value: UniCSSUnitValue): void
+    setStyleMargin(value: number, unit: UniCSSUnitType): void
+    getStyleMargin(): UniCSSUnitValue[]      // 数组长度为4
+    setStyleMarginTop(value: UniCSSUnitValue): void
+    setStyleMarginTop(value: number, unit: UniCSSUnitType): void
+    getStyleMarginTop(): UniCSSUnitValue
+    setStyleMarginRight(value: UniCSSUnitValue): void
+    setStyleMarginRight(value: number, unit: UniCSSUnitType): void
+    getStyleMarginRight(): UniCSSUnitValue
+    setStyleMarginBottom(value: UniCSSUnitValue): void
+    setStyleMarginBottom(value: number, unit: UniCSSUnitType): void
+    setStyleMarginBottom(): UniCSSUnitValue
+    setStyleMarginLeft(value: UniCSSUnitValue): void
+    setStyleMarginLeft(value: number, unit: UniCSSUnitType): void
+    getStyleMarginLeft(): UniCSSUnitValue
+    setStylePadding(value: UniCSSUnitValue): void
+    setStylePadding(value: number, unit: UniCSSUnitType): void
+    getStylePadding(): UniCSSUnitValue[]     // 数组长度为4
+    setStylePaddingTop(value: UniCSSUnitValue): void
+    setStylePaddingTop(value: number, unit: UniCSSUnitType): void
+    getStylePaddingTop(): UniCSSUnitValue
+    setStylePaddingRight(value: UniCSSUnitValue): void
+    setStylePaddingRight(value: number, unit: UniCSSUnitType): void
+    getStylePaddingRight(): UniCSSUnitValue
+    setStylePaddingBottom(value: UniCSSUnitValue): void
+    setStylePaddingBottom(value: number, unit: UniCSSUnitType): void
+    getStylePaddingBottom(): UniCSSUnitValue
+    setStylePaddingLeft(value: UniCSSUnitValue): void
+    setStylePaddingLeft(value: number, unit: UniCSSUnitType): void
+    getStylePaddingLeft(): UniCSSUnitValue
+    setStyleBorderStyle(value: UniCSSBorderStyleType): void
+    getStyleBorderStyle(): UniCSSBorderStyleType[]  // 数组长度为4
+    setStyleBorderTopStyle(value: UniCSSBorderStyleType): void
+    getStyleBorderTopStyle(): UniCSSBorderStyleType
+    setStyleBorderRightStyle(value: UniCSSBorderStyleType): void
+    getStyleBorderRightStyle(): UniCSSBorderStyleType
+    setStyleBorderBottomStyle(value: UniCSSBorderStyleType): void
+    getStyleBorderBottomStyle(): UniCSSBorderStyleType
+    setStyleBorderLeftStyle(value: UniCSSBorderStyleType): void
+    getStyleBorderLeftStyle(): UniCSSBorderStyleType
+    setStyleBorderWidth(value: UniCSSUnitValue): void
+    setStyleBorderWidth(value: number, unit: UniCSSUnitType): void
+    getStyleBorderWidth(): UniCSSUnitValue[]      // 数组长度为4
+    setStyleBorderTopWidth(value: UniCSSUnitValue): void
+    setStyleBorderTopWidth(value: number, unit: UniCSSUnitType): void
+    getStyleBorderTopWidth(): UniCSSUnitValue
+    setStyleBorderRightWidth(value: UniCSSUnitValue): void
+    setStyleBorderRightWidth(value: number, unit: UniCSSUnitType): void
+    getStyleBorderRightWidth(): UniCSSUnitValue
+    setStyleBorderBottomWidth(value: UniCSSUnitValue): void
+    setStyleBorderBottomWidth(value: number, unit: UniCSSUnitType): void
+    getStyleBorderBottomWidth(): UniCSSUnitValue
+    setStyleBorderLeftWidth(value: UniCSSUnitValue): void
+    setStyleBorderLeftWidth(value: number, unit: UniCSSUnitType): void
+    getStyleBorderLeftWidth(): UniCSSUnitValue
+    /**
+     * 设置Flex相关CSS属性
+     */
+    setStyleFlexDirection(value: UniCSSFlexDirectionType): void
+    getStyleFlexDirection(): UniCSSFlexDirectionType
+    setStyleFlexWrap(value: UniCSSFlexWrapType): void
+    getStyleFlexWrap(): UniCSSFlexWrapType
+    setStyleFlexGrow(value: number): void
+    getStyleFlexGrow(): number
+    setStyleFlexShrink(value: number): void
+    getStyleFlexShrink(): number
+    setStyleFlexBasis(value: UniCSSUnitValue): void
+    setStyleFlexBasis(value: number, unit: UniCSSUnitType): void
+    getStyleFlexBasis(): UniCSSUnitValue
+    setStyleJustifyContent(value: UniCSSJustifyContentType): void
+    getStyleJustifyContent(): UniCSSJustifyContentType
+    setStyleAlignItems(value: UniCSSAlignItemsType): void
+    getStyleAlignItems(): UniCSSAlignItemsType
+    setStyleAlignSelf(value: UniCSSAlignSelfType): void
+    getStyleAlignSelf(): UniCSSAlignSelfType
+    setStyleAlignContent(value: UniCSSAlignContentType): void
+    getStyleAlignContent(): UniCSSAlignContentType
+    /**
+     * 获取CSS属性
+     * 返回字符串格式数据
+     */
+    getStyleString(key: UniCSSPropertyID | UniCSSPropertyName): string | null
+
+    /**
+     * 以下方法在FlexNode和DOM层封装
+     * - Android平台：c层和kt层都需要封装
+     * - iOS平台：oc层实现
+     * - 鸿蒙平台：c层实现
+     */
+    /**
+     * 添加子元素
+     */
+    appendChild(child: UniElement): void
+    /**
+     * 插入子元素
+     */
+    insertBefore(child: UniElement, ref?: UniElement | null): UniElement | null
+    /**
+     * 删除子元素
+     */
+    removeChild(child: UniElement): UniElement | null
+    /**
+     * 从元素所属的DOM树中删除
+     */
+    remove(): void
+    /**
+     * 更新元素样式
+     * 仅内部使用
+     */
+    updateStyle(style: UniElementStyles): void
+    updateStyle(key: UniCSSPropertyID | UniCSSPropertyName, value: UniCSSPropertyValue): void
+
+    /**
+     * 以下方法在DOM层封装实现
+     * - Android平台：kotlin层实现
+     * - iOS平台：oc层实现
+     * - 鸿蒙平台：c层实现
+     */
+    /**
+     * 元素是否包含有指定的属性
+     * 属性存在则返回true，否则返回false。
+     */
+    hasAttribute(key: string): boolean
+    /**
+     * 获取元素的属性值
+     */
+    getAttribute(key: string): string | null
+    /**
+     * 获取元素的属性值，返回真实属性值类型
+     */
+    getAnyAttribute(key: string): any | null
+    /**
+     * 设置元素的属性值
+     */
+    setAttribute(key: string, value: string): void
+    /**
+     * 设置元素的属性值，通过真实属性值类型设置
+     */
+    setAnyAttribute(key: string, value: any): void
+    /**
+     * 删除元素的指定属性
+     * 如果指定的属性不存在，则不做任何操作，也不会产生错误。
+     */
+    removeAttribute(key: string): void
+
+    /**
+     * 返回与指定的选择器组匹配的元素的后代的第一个元素
+     */
+    querySelector(selector: string): UniElement | null
+    /**
+     * 返回与指定的选择器组匹配的所有元素
+     */
+    querySelectorAll(selector: string): UniElement[] | null
+
+    /**
+     * 滚动指定距离
+     */
+    scrollBy(x: number, y: number): void
+    /**
+     * 滚动指定坐标位置
+     */
+    scrollTo(x: number, y: number): void
+
+    /**
+     * 元素丢失焦点
+     * 仅支持焦点的元素生效
+     */
+    blur(): void
+    /**
+     * 元素获取焦点
+     * 仅支持焦点的元素生效
+     */
+    focus(): void
+
+  }
+}
+

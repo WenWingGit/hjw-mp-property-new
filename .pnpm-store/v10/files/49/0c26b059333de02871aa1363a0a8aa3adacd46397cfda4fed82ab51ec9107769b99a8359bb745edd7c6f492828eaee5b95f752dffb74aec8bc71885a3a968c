@@ -1,0 +1,54 @@
+'use strict';
+
+const UNSUPPORTED_CHARS = [".", ":", "%", "!", "#", "(", ")", "[", "/", "]", ",", "$", "{", "}", "@", "+", "^", "&", "<", ">", "'"];
+
+function encodeNonLatin(str) {
+  const regex = /[^A-Za-z0-9!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~\\]+/g;
+  if (!regex.test(str))
+    return str;
+  if (str.includes(" $$ "))
+    return str;
+  function encode(str2) {
+    let encoded = "";
+    for (let i = 0; i < str2.length; i++)
+      encoded += str2.charCodeAt(i);
+    return encoded;
+  }
+  return str.replace(regex, (match) => encode(match));
+}
+
+function transformerApplet(options = {}) {
+  const enable = options.enable ?? true;
+  const layer = options.layer ?? "applet_shortcuts";
+  const _UNSUPPORTED_CHARS = [...UNSUPPORTED_CHARS, ...options.unsupportedChars ?? []];
+  const ESCAPED_UNSUPPORTED_CHARS = _UNSUPPORTED_CHARS.map((char) => `\\${char}`);
+  const charTestReg = new RegExp(`[${ESCAPED_UNSUPPORTED_CHARS.join("")}]`);
+  const charReplaceReg = new RegExp(`[${ESCAPED_UNSUPPORTED_CHARS.join("")}]`, "g");
+  return {
+    name: "transformer-applet",
+    enforce: "pre",
+    async transform(s, id, ctx) {
+      let code = s.toString();
+      if (!enable)
+        return;
+      const { uno, tokens } = ctx;
+      const { matched } = await uno.generate(code, { preflights: false });
+      const replacements = Array.from(matched).filter((i) => charTestReg.test(i)).filter((i) => !i.includes("="));
+      for (const replace of replacements) {
+        let replaced = replace.replace(charReplaceReg, "_a_");
+        replaced = encodeNonLatin(replaced);
+        while (replaced.startsWith("-"))
+          replaced = replaced.slice(1);
+        uno.config.shortcuts.push([replaced, replace, { layer }]);
+        tokens.add(replaced);
+        code = code.replace(new RegExp(escapeRegExp(replace), "g"), replaced);
+      }
+      s.overwrite(0, s.original.length, code);
+    }
+  };
+}
+function escapeRegExp(string) {
+  return string.replace(/[.:%!#()[\]/,${}@+^&<>]/g, "\\$&");
+}
+
+module.exports = transformerApplet;

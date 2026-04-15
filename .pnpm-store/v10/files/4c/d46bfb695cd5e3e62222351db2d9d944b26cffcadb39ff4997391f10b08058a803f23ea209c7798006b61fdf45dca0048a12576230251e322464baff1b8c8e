@@ -1,0 +1,9 @@
+import { e as ComponentResolver } from './types-873df979.js';
+import '@rollup/pluginutils';
+import '@antfu/utils';
+
+declare function AnoResolver(): ComponentResolver;
+
+declare function UniUIResolver(): ComponentResolver;
+
+export { AnoResolver, UniUIResolver };

@@ -1,0 +1,189 @@
+// 本文件为自动构建生成
+import {
+  UniTextDecorationStyleType as UniTextDecorationStyleTypeOrigin,
+  UniTextDecorationLineType as UniTextDecorationLineTypeOrigin,
+  UniTextDecorationThicknessType as UniTextDecorationThicknessTypeOrigin,
+  UniFontStyle as UniFontStyleOrigin,
+  UniFontWeight as UniFontWeightOrigin,
+  UniTextLineHeightType as UniTextLineHeightTypeOrigin,
+  UniTextAlign as UniTextAlignOrigin,
+  UniTextOverflow as UniTextOverflowOrigin,
+  UniWhiteSpace as UniWhiteSpaceOrigin,
+  UniTextLength as UniTextLengthOrigin,
+  UniTextDecorationThickness as UniTextDecorationThicknessOrigin,
+  UniTextDecorationStyle as UniTextDecorationStyleOrigin,
+  UniTextLineHeight as UniTextLineHeightOrigin,
+  UniTextShadow as UniTextShadowOrigin,
+  UniNativeViewType as UniNativeViewTypeOrigin,
+  UniNativeView as UniNativeViewOrigin,
+  UniNativeViewStyles as UniNativeViewStylesOrigin,
+  UniNativeTextView as UniNativeTextViewOrigin,
+  UniNativeScrollViewDirectionType as UniNativeScrollViewDirectionTypeOrigin,
+  UniNativeScrollView as UniNativeScrollViewOrigin,
+  UniNativeScrollViewOptions as UniNativeScrollViewOptionsOrigin,
+  UniNativeImageView as UniNativeImageViewOrigin,
+  UniNativeBorderStyle as UniNativeBorderStyleOrigin,
+  UniNativeOverflowType as UniNativeOverflowTypeOrigin,
+  UniNativePointerEventType as UniNativePointerEventTypeOrigin,
+  UniNativeDisplayType as UniNativeDisplayTypeOrigin,
+  UniNativePositionType as UniNativePositionTypeOrigin,
+  UniNativeVisibilityType as UniNativeVisibilityTypeOrigin,
+  UniNativeTransformType as UniNativeTransformTypeOrigin,
+  UniNativeSlotType as UniNativeSlotTypeOrigin,
+  UniNativeColor as UniNativeColorOrigin,
+  UniNativeLayout as UniNativeLayoutOrigin,
+  UniNativeLayoutSize as UniNativeLayoutSizeOrigin,
+  UniNativeLayoutPosition as UniNativeLayoutPositionOrigin,
+  UniNativePadding as UniNativePaddingOrigin,
+  UniNativePaddings as UniNativePaddingsOrigin,
+  UniNativeMargin as UniNativeMarginOrigin,
+  UniNativeMargins as UniNativeMarginsOrigin,
+  UniNativeBorders as UniNativeBordersOrigin,
+  UniNativeBorder as UniNativeBorderOrigin,
+  UniNativeBorderWidth as UniNativeBorderWidthOrigin,
+  UniNativeBorderWidths as UniNativeBorderWidthsOrigin,
+  UniNativeBorderColor as UniNativeBorderColorOrigin,
+  UniNativeBorderColors as UniNativeBorderColorsOrigin,
+  UniNativeBorderStyles as UniNativeBorderStylesOrigin,
+  UniNativeBorderRadius as UniNativeBorderRadiusOrigin,
+  UniNativeBorderRadiuses as UniNativeBorderRadiusesOrigin,
+  UniNativeBoxShadow as UniNativeBoxShadowOrigin,
+  UniNativeCustomView as UniNativeCustomViewOrigin,
+  UniNativeBaseView as UniNativeBaseViewOrigin,
+  UniImageModeType as UniImageModeTypeOrigin,
+  UniImageSize as UniImageSizeOrigin,
+  UniElementType as UniElementTypeOrigin,
+  UniElementStyles as UniElementStylesOrigin,
+  UniCustomViewElement as UniCustomViewElementOrigin,
+  UniPosition as UniPositionOrigin,
+  UniSize as UniSizeOrigin,
+  UniLTWH as UniLTWHOrigin,
+  UniLTRB as UniLTRBOrigin,
+  UniCSSUnitType as UniCSSUnitTypeOrigin,
+  UniCSSUnitValue as UniCSSUnitValueOrigin,
+  UniCSSPropertyID as UniCSSPropertyIDOrigin,
+  UniCSSBoxSizingType as UniCSSBoxSizingTypeOrigin,
+  UniCSSDisplayType as UniCSSDisplayTypeOrigin,
+  UniCSSPositionType as UniCSSPositionTypeOrigin,
+  UniCSSVisibilityType as UniCSSVisibilityTypeOrigin,
+  UniCSSBorderStyleType as UniCSSBorderStyleTypeOrigin,
+  UniCSSFlexDirectionType as UniCSSFlexDirectionTypeOrigin,
+  UniCSSFlexWrapType as UniCSSFlexWrapTypeOrigin,
+  UniCSSFlexAlignType as UniCSSFlexAlignTypeOrigin,
+  UniCSSPropertyName as UniCSSPropertyNameOrigin,
+  UniCSSPropertyValue as UniCSSPropertyValueOrigin,
+  UniCSSJustifyContentType as UniCSSJustifyContentTypeOrigin,
+  UniCSSAlignItemsType as UniCSSAlignItemsTypeOrigin,
+  UniCSSAlignSelfType as UniCSSAlignSelfTypeOrigin,
+  UniCSSAlignContentType as UniCSSAlignContentTypeOrigin,
+} from './index'
+
+declare global {
+  const UniTextDecorationStyleType: typeof UniTextDecorationStyleTypeOrigin
+  type UniTextDecorationStyleType = UniTextDecorationStyleTypeOrigin
+  const UniTextDecorationLineType: typeof UniTextDecorationLineTypeOrigin
+  type UniTextDecorationLineType = UniTextDecorationLineTypeOrigin
+  const UniTextDecorationThicknessType: typeof UniTextDecorationThicknessTypeOrigin
+  type UniTextDecorationThicknessType = UniTextDecorationThicknessTypeOrigin
+  const UniFontStyle: typeof UniFontStyleOrigin
+  type UniFontStyle = UniFontStyleOrigin
+  const UniFontWeight: typeof UniFontWeightOrigin
+  type UniFontWeight = UniFontWeightOrigin
+  const UniTextLineHeightType: typeof UniTextLineHeightTypeOrigin
+  type UniTextLineHeightType = UniTextLineHeightTypeOrigin
+  const UniTextAlign: typeof UniTextAlignOrigin
+  type UniTextAlign = UniTextAlignOrigin
+  const UniTextOverflow: typeof UniTextOverflowOrigin
+  type UniTextOverflow = UniTextOverflowOrigin
+  const UniWhiteSpace: typeof UniWhiteSpaceOrigin
+  type UniWhiteSpace = UniWhiteSpaceOrigin
+  type UniTextLength = UniTextLengthOrigin
+  type UniTextDecorationThickness = UniTextDecorationThicknessOrigin
+  type UniTextDecorationStyle = UniTextDecorationStyleOrigin
+  type UniTextLineHeight = UniTextLineHeightOrigin
+  type UniTextShadow = UniTextShadowOrigin
+  const UniNativeViewType: typeof UniNativeViewTypeOrigin
+  type UniNativeViewType = UniNativeViewTypeOrigin
+  type UniNativeView = UniNativeViewOrigin
+  type UniNativeViewStyles = UniNativeViewStylesOrigin
+  type UniNativeTextView = UniNativeTextViewOrigin
+  const UniNativeScrollViewDirectionType: typeof UniNativeScrollViewDirectionTypeOrigin
+  type UniNativeScrollViewDirectionType = UniNativeScrollViewDirectionTypeOrigin
+  type UniNativeScrollView = UniNativeScrollViewOrigin
+  type UniNativeScrollViewOptions = UniNativeScrollViewOptionsOrigin
+  type UniNativeImageView = UniNativeImageViewOrigin
+  const UniNativeBorderStyle: typeof UniNativeBorderStyleOrigin
+  type UniNativeBorderStyle = UniNativeBorderStyleOrigin
+  const UniNativeOverflowType: typeof UniNativeOverflowTypeOrigin
+  type UniNativeOverflowType = UniNativeOverflowTypeOrigin
+  const UniNativePointerEventType: typeof UniNativePointerEventTypeOrigin
+  type UniNativePointerEventType = UniNativePointerEventTypeOrigin
+  const UniNativeDisplayType: typeof UniNativeDisplayTypeOrigin
+  type UniNativeDisplayType = UniNativeDisplayTypeOrigin
+  const UniNativePositionType: typeof UniNativePositionTypeOrigin
+  type UniNativePositionType = UniNativePositionTypeOrigin
+  const UniNativeVisibilityType: typeof UniNativeVisibilityTypeOrigin
+  type UniNativeVisibilityType = UniNativeVisibilityTypeOrigin
+  const UniNativeTransformType: typeof UniNativeTransformTypeOrigin
+  type UniNativeTransformType = UniNativeTransformTypeOrigin
+  const UniNativeSlotType: typeof UniNativeSlotTypeOrigin
+  type UniNativeSlotType = UniNativeSlotTypeOrigin
+  type UniNativeColor = UniNativeColorOrigin
+  type UniNativeLayout = UniNativeLayoutOrigin
+  type UniNativeLayoutSize = UniNativeLayoutSizeOrigin
+  type UniNativeLayoutPosition = UniNativeLayoutPositionOrigin
+  type UniNativePadding = UniNativePaddingOrigin
+  type UniNativePaddings = UniNativePaddingsOrigin
+  type UniNativeMargin = UniNativeMarginOrigin
+  type UniNativeMargins = UniNativeMarginsOrigin
+  type UniNativeBorders = UniNativeBordersOrigin
+  type UniNativeBorder = UniNativeBorderOrigin
+  type UniNativeBorderWidth = UniNativeBorderWidthOrigin
+  type UniNativeBorderWidths = UniNativeBorderWidthsOrigin
+  type UniNativeBorderColor = UniNativeBorderColorOrigin
+  type UniNativeBorderColors = UniNativeBorderColorsOrigin
+  type UniNativeBorderStyles = UniNativeBorderStylesOrigin
+  type UniNativeBorderRadius = UniNativeBorderRadiusOrigin
+  type UniNativeBorderRadiuses = UniNativeBorderRadiusesOrigin
+  type UniNativeBoxShadow = UniNativeBoxShadowOrigin
+  type UniNativeCustomView = UniNativeCustomViewOrigin
+  type UniNativeBaseView = UniNativeBaseViewOrigin
+  const UniImageModeType: typeof UniImageModeTypeOrigin
+  type UniImageModeType = UniImageModeTypeOrigin
+  type UniImageSize = UniImageSizeOrigin
+  const UniElementType: typeof UniElementTypeOrigin
+  type UniElementType = UniElementTypeOrigin
+  type UniElementStyles = UniElementStylesOrigin
+  type UniCustomViewElement = UniCustomViewElementOrigin
+  type UniPosition = UniPositionOrigin
+  type UniSize = UniSizeOrigin
+  type UniLTWH = UniLTWHOrigin
+  type UniLTRB = UniLTRBOrigin
+  const UniCSSUnitType: typeof UniCSSUnitTypeOrigin
+  type UniCSSUnitType = UniCSSUnitTypeOrigin
+  type UniCSSUnitValue = UniCSSUnitValueOrigin
+  const UniCSSPropertyID: typeof UniCSSPropertyIDOrigin
+  type UniCSSPropertyID = UniCSSPropertyIDOrigin
+  const UniCSSBoxSizingType: typeof UniCSSBoxSizingTypeOrigin
+  type UniCSSBoxSizingType = UniCSSBoxSizingTypeOrigin
+  const UniCSSDisplayType: typeof UniCSSDisplayTypeOrigin
+  type UniCSSDisplayType = UniCSSDisplayTypeOrigin
+  const UniCSSPositionType: typeof UniCSSPositionTypeOrigin
+  type UniCSSPositionType = UniCSSPositionTypeOrigin
+  const UniCSSVisibilityType: typeof UniCSSVisibilityTypeOrigin
+  type UniCSSVisibilityType = UniCSSVisibilityTypeOrigin
+  const UniCSSBorderStyleType: typeof UniCSSBorderStyleTypeOrigin
+  type UniCSSBorderStyleType = UniCSSBorderStyleTypeOrigin
+  const UniCSSFlexDirectionType: typeof UniCSSFlexDirectionTypeOrigin
+  type UniCSSFlexDirectionType = UniCSSFlexDirectionTypeOrigin
+  const UniCSSFlexWrapType: typeof UniCSSFlexWrapTypeOrigin
+  type UniCSSFlexWrapType = UniCSSFlexWrapTypeOrigin
+  const UniCSSFlexAlignType: typeof UniCSSFlexAlignTypeOrigin
+  type UniCSSFlexAlignType = UniCSSFlexAlignTypeOrigin
+  type UniCSSPropertyName = UniCSSPropertyNameOrigin
+  type UniCSSPropertyValue = UniCSSPropertyValueOrigin
+  type UniCSSJustifyContentType = UniCSSJustifyContentTypeOrigin
+  type UniCSSAlignItemsType = UniCSSAlignItemsTypeOrigin
+  type UniCSSAlignSelfType = UniCSSAlignSelfTypeOrigin
+  type UniCSSAlignContentType = UniCSSAlignContentTypeOrigin
+}

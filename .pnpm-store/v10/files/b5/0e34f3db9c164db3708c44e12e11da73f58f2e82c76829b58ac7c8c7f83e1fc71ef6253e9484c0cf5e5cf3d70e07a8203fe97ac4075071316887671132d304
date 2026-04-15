@@ -1,0 +1,35 @@
+import { definePreset } from '@unocss/core';
+
+function toCommaStyleColorFunction(str) {
+  return str.replace(/(rgb|hsl)a?\(([^)]+)\)/g, (_, fn, v) => {
+    const [rgb, alpha] = v.split(/\//g).map((i) => i.trim());
+    if (alpha && !fn.endsWith("a"))
+      fn += "a";
+    const parts = rgb.split(/(?!,)\s+/).map((i) => i.trim());
+    if (alpha)
+      parts.push(alpha);
+    return `${fn}(${parts.filter(Boolean).join(", ")})`;
+  });
+}
+
+const presetLegacyCompat = definePreset((options = {}) => {
+  const {
+    commaStyleColorFunction = false
+  } = options;
+  return {
+    name: "@unocss/preset-legacy-compat",
+    postprocess: (util) => {
+      util.entries.forEach((i) => {
+        let value = i[1];
+        if (typeof value !== "string")
+          return;
+        if (commaStyleColorFunction)
+          value = toCommaStyleColorFunction(value);
+        if (value !== i[1])
+          i[1] = value;
+      });
+    }
+  };
+});
+
+export { presetLegacyCompat as default, presetLegacyCompat };

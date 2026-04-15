@@ -1,0 +1,140 @@
+var version = "0.0.1";
+
+declare class NumeralsConverter<T> {
+    private array;
+    constructor(array: T[]);
+    getValueFromIndex(index: number | string): string;
+    getIndexFromValue(strList: string): string;
+}
+
+declare function isValidNumber(num: number | string): boolean;
+
+declare function scientificToNumber(num: number | string): string;
+
+declare function parseRationalNumber(str: string): {
+    sign: string;
+    integerPart: string;
+    fractionalPart: string;
+};
+
+declare function isScientificNotation(num: number | string): boolean;
+
+type ModeType = "start" | "middle" | "end";
+interface OperateSequentCharactersOptions {
+    mode: ModeType;
+    remove?: boolean;
+}
+declare function operateSequentCharacters(str: string, searchString: string, modes: OperateSequentCharactersOptions[] | OperateSequentCharactersOptions): string;
+
+declare const RESOURCES: {
+    "zh-CN-lowercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-CN-uppercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-TW-lowercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-TW-uppercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-HK-lowercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-HK-uppercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+};
+
+type LanguageType = keyof typeof RESOURCES;
+type ChineseNumericType = {
+    digitsList?: string[];
+    magnitudeList?: string[];
+    baseNumerals?: string[];
+    minusSign?: string;
+    decimalPoint?: string;
+};
+interface NumberToZhOptions extends ChineseNumericType {
+    language?: LanguageType;
+    skipOneBeforeTen?: boolean;
+    /**
+     * @default "WW"
+     * @description 启用万亿情况下，重复的数级
+     */
+    repeatChar?: false | "WW" | "YY";
+    /**
+     * @default 8
+     * @description 超过万位 10^8，分节长度
+     */
+    digitsAboveTenThousand?: 4 | "Quaternary" | 8 | "Octal";
+    /**
+     * @default _
+     * @description 字符串数字中支持原生数字分节
+     */
+    numericUnderscores?: string;
+    /**
+     * @default false
+     * @description 数级后面的千位不是零，数级前面的个位是零，零加在数级的「前」面，正常情况是省略的。
+     * @example 205000 => 二十{零}万五千
+     */
+    hangingZerosBeforeDigits?: boolean;
+    /**
+     * @default false
+     * @description 数级后面的千位不是零，数级前面的个位是零，零加在数级的「后」面，人民银行规定的错误写法。
+     * @example 205000 => 二十万{零}五千
+     */
+    hangingZerosAfterDigits?: boolean;
+}
+
+declare function resolveOptions(options: NumberToZhOptions): {
+    skipOneBeforeTen: boolean;
+    digitsAboveTenThousand: 4 | 8;
+    repeatChar: false | "WW" | "YY";
+    numericUnderscores: string;
+    hangingZerosBeforeDigits: boolean;
+    hangingZerosAfterDigits: boolean;
+    digitsList: string[];
+    magnitudeList: string[];
+    baseNumerals: string[];
+    minusSign: string;
+    decimalPoint: string;
+};
+
+type NumberTranslatorOptions = ReturnType<typeof resolveOptions>;
+declare function numberTranslator({ wholeNumber, resolved, }: {
+    wholeNumber: string;
+    resolved: NumberTranslatorOptions;
+}): string;
+
+declare function numberToZh(num: number | string, options?: NumberToZhOptions): string | number;
+
+declare function integerToZh(integerPart: string, resolved: NumberTranslatorOptions): string;
+
+declare function detectIntegerBoundary(integerSize: number, magnitudeListSize: number, step: number, repeatChar: unknown, digitsListSize: number): void;
+
+export { type ChineseNumericType, type LanguageType, type NumberToZhOptions, type NumberTranslatorOptions, NumeralsConverter, RESOURCES, detectIntegerBoundary, integerToZh, isScientificNotation, isValidNumber, numberToZh, numberTranslator, operateSequentCharacters, parseRationalNumber, resolveOptions, scientificToNumber, version };

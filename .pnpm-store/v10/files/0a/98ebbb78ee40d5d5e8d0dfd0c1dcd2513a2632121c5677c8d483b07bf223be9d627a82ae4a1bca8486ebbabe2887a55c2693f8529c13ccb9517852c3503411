@@ -1,0 +1,34 @@
+import { UniNativeBaseView,  } from "./UniNativeBaseView"
+import { UniImageModeType } from "./UniImageElement";
+
+
+
+/**
+ * 图片组件 image
+ */
+export interface UniNativeImageView extends UniNativeBaseView {
+
+  /**
+   * 设置图片资源地址
+   *  仅Android平台支持
+   *  其它平台通过UniElement在c层加载图片后更新
+   */
+  src(src: string): void;
+  
+  /**
+   * 设置图片裁剪、缩放模式
+   */
+  mode(value: UniImageModeType): void;
+  
+  /**
+   * 设置是否懒加载
+   */
+  lazyLoad(value: boolean): void;
+  
+  /**
+   * 图片显示动画效果
+   */
+  fadeShow(value: boolean): void;
+}
+
+

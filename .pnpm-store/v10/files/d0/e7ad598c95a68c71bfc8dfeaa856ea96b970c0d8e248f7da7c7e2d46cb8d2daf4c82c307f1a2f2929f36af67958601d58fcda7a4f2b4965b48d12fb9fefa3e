@@ -1,0 +1,97 @@
+'use strict';
+
+const processShim = typeof process !== "undefined" ? process : {};
+const envShim = processShim.env || {};
+const platform = envShim.UNI_PLATFORM;
+const utsPlatform = envShim.UNI_UTS_PLATFORM;
+const appPlatform = envShim.UNI_APP_PLATFORM;
+const subPlatform = envShim.UNI_SUB_PLATFORM;
+const cliContext = envShim.UNI_CLI_CONTEXT;
+const inputDir = envShim.UNI_INPUT_DIR;
+const outputDir = envShim.UNI_OUTPUT_DIR;
+const hasDarkMode = toBoolean(envShim.VUE_APP_DARK_MODE);
+const hasSourcemap = toBoolean(envShim.SOURCEMAP);
+const compiler = envShim.UNI_COMPILER;
+const nvueCompiler = envShim.UNI_NVUE_COMPILER;
+const nvueStyleCompiler = envShim.UNI_NVUE_STYLE_COMPILER;
+const compilerVersion = envShim.UNI_COMPILER_VERSION;
+const compilerVersionType = envShim.UNI_COMPILER_VERSION_TYPE;
+const statTitleJson = parseJSON(
+  envShim.STAT_TITLE_JSON
+);
+const customContext = envShim.UNI_CUSTOM_CONTEXT;
+const customScript = envShim.UNI_CUSTOM_SCRIPT;
+const customDefine = envShim.UNI_CUSTOM_DEFINE;
+const subpackage = envShim.UNI_SUBPACKAGE;
+const isMpPlugin = toBoolean(envShim.UNI_MP_PLUGIN);
+const renderer = envShim.UNI_RENDERER;
+const rendererNative = envShim.UNI_RENDERER_NATIVE;
+const isMinimize = toBoolean(envShim.UNI_MINIMIZE);
+const isSSRClient = toBoolean(envShim.UNI_SSR_CLIENT);
+const isSSRServer = toBoolean(envShim.UNI_SSR_SERVER);
+const isH5 = platform === "h5";
+const isApp = platform === "app";
+const isAppAndroid = appPlatform === "android" || utsPlatform === "app-android";
+const isAppIOS = appPlatform === "ios" || utsPlatform === "app-ios";
+const isMp = /^mp-/i.test(platform);
+const isMpWeixin = platform === "mp-weixin";
+const isMpAlipay = platform === "mp-alipay";
+const isMpBaidu = platform === "mp-baidu";
+const isMpKuaishou = platform === "mp-kuaishou";
+const isMpQQ = platform === "mp-qq";
+const isMpToutiao = platform === "mp-toutiao";
+const isQuickapp = /^quickapp--webview/i.test(platform);
+const isQuickappUnion = platform === "quickapp-webview-union";
+const isQuickappHuawei = platform === "quickapp-webview-huawei";
+function toBoolean(val) {
+  return val ? val !== "false" : false;
+}
+function parseJSON(val) {
+  let obj;
+  try {
+    obj = JSON.parse(val || "{}");
+  } catch (error) {
+    obj = {};
+  }
+  return obj;
+}
+
+exports.appPlatform = appPlatform;
+exports.cliContext = cliContext;
+exports.compiler = compiler;
+exports.compilerVersion = compilerVersion;
+exports.compilerVersionType = compilerVersionType;
+exports.customContext = customContext;
+exports.customDefine = customDefine;
+exports.customScript = customScript;
+exports.hasDarkMode = hasDarkMode;
+exports.hasSourcemap = hasSourcemap;
+exports.inputDir = inputDir;
+exports.isApp = isApp;
+exports.isAppAndroid = isAppAndroid;
+exports.isAppIOS = isAppIOS;
+exports.isH5 = isH5;
+exports.isMinimize = isMinimize;
+exports.isMp = isMp;
+exports.isMpAlipay = isMpAlipay;
+exports.isMpBaidu = isMpBaidu;
+exports.isMpKuaishou = isMpKuaishou;
+exports.isMpPlugin = isMpPlugin;
+exports.isMpQQ = isMpQQ;
+exports.isMpToutiao = isMpToutiao;
+exports.isMpWeixin = isMpWeixin;
+exports.isQuickapp = isQuickapp;
+exports.isQuickappHuawei = isQuickappHuawei;
+exports.isQuickappUnion = isQuickappUnion;
+exports.isSSRClient = isSSRClient;
+exports.isSSRServer = isSSRServer;
+exports.nvueCompiler = nvueCompiler;
+exports.nvueStyleCompiler = nvueStyleCompiler;
+exports.outputDir = outputDir;
+exports.platform = platform;
+exports.renderer = renderer;
+exports.rendererNative = rendererNative;
+exports.statTitleJson = statTitleJson;
+exports.subPlatform = subPlatform;
+exports.subpackage = subpackage;
+exports.utsPlatform = utsPlatform;

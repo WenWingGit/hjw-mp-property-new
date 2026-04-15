@@ -1,0 +1,12 @@
+import { UniElement } from './index'
+
+
+
+/**
+ * UniCustomViewElement
+ */
+export interface UniCustomViewElement extends UniElement {
+
+
+}
+

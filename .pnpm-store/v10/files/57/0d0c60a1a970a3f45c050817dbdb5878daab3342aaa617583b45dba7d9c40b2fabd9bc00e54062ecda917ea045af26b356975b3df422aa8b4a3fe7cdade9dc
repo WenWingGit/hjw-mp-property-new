@@ -1,0 +1,13 @@
+import { UniElement } from './UniElement'
+
+declare global {
+
+  /**
+   * UniScrollViewElement
+   */
+  interface UniScrollViewElement extends UniElement {
+
+
+  }
+}
+

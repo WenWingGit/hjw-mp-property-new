@@ -1,0 +1,67 @@
+{
+  "name": "@uni-helper/vite-plugin-uni-platform",
+  "type": "module",
+  "version": "0.0.4",
+  "packageManager": "pnpm@8.7.6",
+  "description": "",
+  "author": "KeJun",
+  "license": "MIT",
+  "homepage": "https://github.com/kejunmao/@uni-helper/vite-plugin-uni-platform#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kejunmao/@uni-helper/vite-plugin-uni-platform.git"
+  },
+  "bugs": "https://github.com/kejunmao/@uni-helper/vite-plugin-uni-platform/issues",
+  "keywords": [],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*",
+        "./dist/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@uni-helper/uni-env": "^0.0.3"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^0.40.3",
+    "@types/node": "^20.6.5",
+    "bumpp": "^9.2.0",
+    "eslint": "^8.50.0",
+    "esno": "^0.17.0",
+    "typescript": "^5.2.2",
+    "unbuild": "^2.0.0",
+    "vite": "^4.4.9",
+    "vitest": "^0.34.5"
+  },
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --stub",
+    "play": "pnpm dev && npm -C playground run dev:h5",
+    "release": "bumpp",
+    "start": "esno src/index.ts",
+    "test": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  }
+}

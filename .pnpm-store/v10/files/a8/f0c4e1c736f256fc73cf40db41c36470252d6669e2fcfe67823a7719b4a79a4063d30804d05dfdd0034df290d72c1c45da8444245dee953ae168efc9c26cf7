@@ -1,0 +1,127 @@
+import { writeFileSync, existsSync } from 'node:fs';
+import process from 'node:process';
+import { watchConfig } from 'c12';
+import { resolve } from 'node:path';
+import { normalizePath } from 'vite';
+
+const manifestJsonPath = normalizePath(
+  resolve(process.env.UNI_INPUT_DIR || `${process.cwd()}/src`, "manifest.json")
+);
+const defaultManifestConfig = {
+  "name": "",
+  "appid": "",
+  "description": "",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  /* 5+App特有相关 */
+  "app-plus": {
+    usingComponents: true,
+    nvueStyleCompiler: "uni-app",
+    compilerVersion: 3,
+    splashscreen: {
+      alwaysShowBeforeRender: true,
+      waiting: true,
+      autoclose: true,
+      delay: 0
+    },
+    /* 模块配置 */
+    modules: {},
+    /* 应用发布信息 */
+    distribute: {
+      /* android打包配置 */
+      android: {
+        permissions: []
+      },
+      /* ios打包配置 */
+      ios: {},
+      /* SDK配置 */
+      sdkConfigs: {}
+    }
+  },
+  /* 快应用特有相关 */
+  "quickapp": {},
+  /* 小程序特有相关 */
+  "mp-weixin": {
+    appid: "",
+    setting: {
+      urlCheck: false
+    },
+    usingComponents: true
+  },
+  "mp-alipay": {
+    usingComponents: true
+  },
+  "mp-baidu": {
+    usingComponents: true
+  },
+  "mp-toutiao": {
+    usingComponents: true
+  },
+  "uniStatistics": {
+    enable: false
+  },
+  "vueVersion": "3"
+};
+
+function resolveOptions(userOptions) {
+  return {
+    minify: false,
+    ...userOptions
+  };
+}
+
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+class ManifestContext {
+  constructor(options) {
+    __publicField(this, "options");
+    __publicField(this, "unwatch");
+    this.options = resolveOptions(options);
+  }
+  async setup() {
+    const { config, unwatch } = await watchConfig({
+      cwd: process.env.VITE_ROOT_DIR,
+      name: "manifest",
+      defaultConfig: defaultManifestConfig,
+      rcFile: false,
+      packageJson: false,
+      onUpdate: (config2) => {
+        ManifestContext.WriteManifestJSON(config2.newConfig.config, this.options.minify);
+      }
+    });
+    ManifestContext.WriteManifestJSON(config, this.options.minify);
+    this.unwatch = unwatch;
+  }
+  static WriteManifestJSON(config = {}, minify = false) {
+    writeFileSync(
+      manifestJsonPath,
+      JSON.stringify(config, null, minify ? 0 : 2)
+    );
+  }
+  static CheckManifestJsonFile() {
+    if (!existsSync(manifestJsonPath))
+      ManifestContext.WriteManifestJSON();
+  }
+}
+
+function defineManifestConfig(config) {
+  return config;
+}
+
+ManifestContext.CheckManifestJsonFile();
+async function VitePluginUniManifest(userOptions = {}) {
+  const ctx = new ManifestContext(userOptions);
+  ctx.setup();
+  return {
+    name: "vite-plugin-uni-manifest",
+    enforce: "pre",
+    buildEnd: () => ctx.unwatch()
+  };
+}
+
+export { VitePluginUniManifest, VitePluginUniManifest as default, defineManifestConfig };

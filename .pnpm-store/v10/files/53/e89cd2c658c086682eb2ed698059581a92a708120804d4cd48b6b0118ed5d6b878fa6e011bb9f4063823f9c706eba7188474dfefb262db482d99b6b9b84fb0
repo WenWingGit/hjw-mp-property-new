@@ -1,0 +1,124 @@
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+const unocss = require('unocss');
+const presetMini = require('@unocss/preset-mini');
+const core = require('@unocss/core');
+
+const UNSUPPORTED_CHARS = [".", ":", "%", "!", "#", "(", ")", "[", "/", "]", ",", "$", "{", "}", "@", "+", "^", "&", "<", ">", "'", "\\"];
+
+function encodeNonSpaceLatin(str) {
+  const regex = /[^A-Za-z0-9!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~\\ ]+/g;
+  if (!regex.test(str))
+    return str;
+  if (str.includes(" $$ "))
+    return str;
+  function encode(str2) {
+    let encoded = "";
+    for (let i = 0; i < str2.length; i++)
+      encoded += str2.charCodeAt(i);
+    return encoded;
+  }
+  return str.replace(regex, (match) => encode(match));
+}
+
+const appletPreflights = [
+  {
+    layer: "preflights",
+    getCSS(ctx) {
+      if (ctx.theme.preflightBase) {
+        const css = core.entriesToCss(Object.entries(ctx.theme.preflightBase));
+        const roots = core.toArray(ctx.theme.preflightRoot ?? ["page,::before,::after", "::backdrop"]);
+        return roots.map((root) => `${root}{${css}}`).join("");
+      }
+    }
+  }
+];
+
+function variantSpaceAndDivide(options) {
+  const betweenElements = options?.betweenElements ?? ["view", "button", "text", "image"];
+  return [
+    (matcher) => {
+      if (matcher.startsWith("_"))
+        return;
+      if (/space-?([xy])-?(-?.+)$/.test(matcher) || /divide-/.test(matcher)) {
+        return {
+          matcher,
+          selector: (input) => {
+            const selectors = betweenElements.map((el) => `${input}>${el}+${el}`);
+            return selectors.join(",");
+          }
+        };
+      }
+    }
+  ];
+}
+
+function transformerApplet(options = {}) {
+  const layer = options.layer ?? "applet_shortcuts";
+  const _UNSUPPORTED_CHARS = [...UNSUPPORTED_CHARS, ...options.unsupportedChars ?? []];
+  const ESCAPED_UNSUPPORTED_CHARS = _UNSUPPORTED_CHARS.map((char) => `\\${char}`);
+  const charTestReg = new RegExp(`[${ESCAPED_UNSUPPORTED_CHARS.join("")}]`);
+  const charReplaceReg = new RegExp(`[${ESCAPED_UNSUPPORTED_CHARS.join("")}]`, "g");
+  const negativeReplaceReg = /^-+/;
+  return {
+    name: "transformer-applet",
+    enforce: "pre",
+    async transform(s, id, ctx) {
+      let code = s.toString();
+      const { uno, tokens } = ctx;
+      const { matched } = await uno.generate(code, { preflights: false });
+      const replacements = Array.from(matched).filter((i) => charTestReg.test(i)).filter((i) => !i.includes("="));
+      for (let replace of replacements) {
+        let replaced = replace.replace(charReplaceReg, "_a_");
+        replaced = encodeNonSpaceLatin(replaced);
+        replace = replace.replace(negativeReplaceReg, "");
+        replaced = replaced.replace(negativeReplaceReg, "");
+        uno.config.shortcuts.push([replaced, replace, { layer }]);
+        tokens.add(replaced);
+        code = code.replaceAll(replace, replaced);
+      }
+      s.overwrite(0, s.original.length, code);
+    }
+  };
+}
+
+function presetApplet(options = {}) {
+  options.preflight = options.preflight ?? true;
+  options.variablePrefix = options.variablePrefix ?? "un-";
+  const _UNSUPPORTED_CHARS = [...UNSUPPORTED_CHARS, ...options.unsupportedChars ?? []];
+  function unoCSSToAppletProcess(str) {
+    const ESCAPED_ESCAPED_UNSUPPORTED_CHARS = _UNSUPPORTED_CHARS.map((char) => `\\\\\\${char}`);
+    const charTestReg = new RegExp(`${ESCAPED_ESCAPED_UNSUPPORTED_CHARS.join("|")}`);
+    const charReplaceReg = new RegExp(`${ESCAPED_ESCAPED_UNSUPPORTED_CHARS.join("|")}`, "g");
+    if (charTestReg.test(str))
+      str = str.replace(charReplaceReg, "_a_");
+    return str;
+  }
+  const _presetUno = unocss.presetUno({ ...options, preflight: false });
+  _presetUno.rules?.pop();
+  _presetUno.variants?.splice(1, 1, ...variantSpaceAndDivide(options));
+  return {
+    ..._presetUno,
+    name: "unocss-preset-applet",
+    preflights: options.preflight ? presetMini.normalizePreflights(appletPreflights, options.variablePrefix) : [],
+    postprocess: [
+      (util) => {
+        if (util.selector) {
+          util.selector = unoCSSToAppletProcess(util.selector);
+          util.selector = encodeNonSpaceLatin(util.selector);
+        }
+        return util;
+      }
+    ],
+    configResolved(config) {
+      if (!config.transformers)
+        config.transformers = [];
+      config.transformers.push(transformerApplet(options));
+    }
+  };
+}
+
+exports.default = presetApplet;
+exports.presetApplet = presetApplet;

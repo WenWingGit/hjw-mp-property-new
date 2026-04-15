@@ -1,0 +1,419 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.resolveAppHarmonyUniModulesEntryDir = exports.resolveAppHarmonyUniModuleDir = exports.resolveAppHarmonyUniModulesRootDir = exports.requireUTSPluginCode = exports.compileArkTS = exports.compileArkTSExtApi = exports.getArkTSAutoImports = exports.mergeArkTSAutoImports = void 0;
+const path_1 = __importDefault(require("path"));
+const fs_extra_1 = __importDefault(require("fs-extra"));
+const utils_1 = require("./utils");
+const fast_glob_1 = require("fast-glob");
+const shared_1 = require("./shared");
+function mergeArkTSAutoImports(...autoImports) {
+    const keys = autoImports.reduce((keys, autoImport) => {
+        for (const key of Object.keys(autoImport)) {
+            keys.add(key);
+        }
+        return keys;
+    }, new Set());
+    const result = {};
+    for (const key of keys) {
+        const imports = autoImports.map((autoImport) => autoImport[key] || []);
+        result[key] = imports.reduce((imports, currentImports) => {
+            for (const currentImport of currentImports) {
+                if (!imports.some((importItem) => importItem[0] === currentImport[0])) {
+                    imports.push(currentImport);
+                }
+            }
+            return imports;
+        }, []);
+    }
+    return result;
+}
+exports.mergeArkTSAutoImports = mergeArkTSAutoImports;
+function getRuntimePackageName(isX = false) {
+    return isX ? '@dcloudio/uni-app-x-runtime' : '@dcloudio/uni-app-runtime';
+}
+function tryRequire(file) {
+    try {
+        return require(file);
+    }
+    catch (e) {
+        return {};
+    }
+}
+function getArkTSAutoImports(isX = false) {
+    const runtimePackageName = getRuntimePackageName(isX);
+    const runtimeExports = [
+        // uts basic
+        ['UTS'],
+        ['defineAsyncApi'],
+        ['defineSyncApi'],
+        ['defineTaskApi'],
+        ['defineOnApi'],
+        ['defineOffApi'],
+        ['getUniProvider'],
+        ['getUniProviders'],
+        ['string'],
+        ['AsyncApiSuccessResult'],
+        ['AsyncApiResult'],
+        ['ApiExecutor'],
+        ['ComponentInternalInstance'],
+        ['ComponentPublicInstance'],
+        ['IUniError'],
+        ['ProtocolOptions'],
+        ['ApiOptions'],
+        ['ApiError'],
+        ['UniError'],
+        ['UniProvider'],
+        ['uni'],
+        ['IUTSObject'],
+        ['UTSObject'],
+        ['UTSJSONObject'],
+        ['SourceError'],
+        ['UTSHarmony'],
+        ['resolveInOperator'],
+        ['IJSONStringify'],
+        ['IUTSDefaultGenericParent'],
+        ['UniElement'], // 注意非uni-app-x也有导出此类型，目前仅为了兼容uni-verify
+    ];
+    if (isX) {
+        runtimeExports.push(
+        // uni-app-x-runtime ets
+        ['customElements'], ['UniCustomElement'], 
+        // ['UniElement'],
+        ['UniElementImpl'], ['document'], ['UniPage'], ['UniPageImpl'], ['UniPointerEvent'], ['UniTouchEvent'], ['UniFormControlElement'], ['UniNativeViewElementImpl'], ['UniNativeViewElement'], ['UniNativeViewEvent'], ['UniTextElement'], ['UniWebViewElement'], ['UniWebViewMessageEvent'], ['UniWebViewMessageEventDetail'], ['UniWebViewContentHeightChangeEvent'], ['UniWebViewContentHeightChangeEventDetail'], ['UniWebViewErrorEvent'], ['UniWebViewErrorEventDetail'], ['UniWebViewDownloadEvent'], ['UniWebViewDownloadEventDetail'], ['UniWebViewLoadingEvent'], ['UniWebViewLoadingEventDetail'], ['UniWebViewLoadEvent'], ['UniWebViewLoadEventDetail'], ['UniWebViewElementLoadDataOptions'], ['uni'], ['UTSHarmony'], ['UniCustomEvent'], ['UniCustomEventOptions'], ['getCurrentPages'], ['UniRefresherEventDetail'], ['UniRefresherEvent'], ['UniScrollEventDetail'], ['UniScrollEvent'], ['UniScrollToLowerEventDetail'], ['UniScrollToLowerEvent'], ['UniScrollToUpperEventDetail'], ['UniScrollToUpperEvent'], ['DOMRect'], ['DrawableContext'], ['UniResizeObserver'], ['UniResizeObserverEntry'], ['UniBorderBoxSize'], ['UniContentBoxSize'], ['UniDevicePixelContentBoxSize'], ['UniIntersectionObserver'], ['createIntersectionObserver'], ['CreateIntersectionObserverOptions'], ['UniIntersectionObserverMargins'], ['UniIntersectionObserverRectResult'], ['UniIntersectionObserverObserveCallbackResult'], ['UniIntersectionObserverObserveCallback'], ['TextDecoder'], ['TextEncoder'], 
+        // element
+        ['UniViewElementImpl'], ['UniLazyViewElementImpl'], ['UniTextElementImpl'], ['UniWebViewElementImpl'], ['UniImageElementImpl'], ['UniScrollViewElementImpl'], ['UniListViewElementImpl'], ['UniListItemElementImpl'], ['UniStickySectionElementImpl'], ['UniStickyHeaderElementImpl'], ['UniNestedScrollHeaderElementImpl'], ['UniNestedScrollBodyElementImpl'], ['UniInputElementImpl'], ['UniTextareaElementImpl'], ['UniSwiperElementImpl'], ['UniSwiperItemElementImpl'], ['UniRichTextElementImpl'], ['UniTabsElementImpl'], ['UniWebViewElementImpl'], 
+        // uni-app-x-runtime framwork js
+        ['CreateSelectorQuery'], ['SelectorQueryNodeInfoCallback'], ['NodeInfo'], ['NodeField'], ['NodesRef'], ['SelectorQuery'], ['OpenDialogPageOptions'], ['OpenDialogPageSuccess'], ['OpenDialogPageFail'], ['OpenDialogPageComplete'], ['CloseDialogPageOptions'], ['CloseDialogPageSuccess'], ['CloseDialogPageFail'], ['CloseDialogPageComplete'], ['NavigateToOptions'], ['NavigateToSuccess'], ['NavigateToFail'], ['NavigateToComplete'], ['NavigateBackOptions'], ['NavigateBackSuccess'], ['NavigateBackFail'], ['NavigateBackComplete'], ['RedirectToOptions'], ['RedirectToSuccess'], ['RedirectToFail'], ['RedirectToComplete'], ['ReLaunchOptions'], ['ReLaunchSuccess'], ['ReLaunchFail'], ['ReLaunchComplete'], ['SwitchTabOptions'], ['SwitchTabSuccess'], ['SwitchTabFail'], ['SwitchTabComplete'], ['HideTabBarOptions'], ['HideTabBarSuccess'], ['HideTabBarFail'], ['HideTabBarComplete'], ['ShowTabBarOptions'], ['ShowTabBarSuccess'], ['ShowTabBarFail'], ['ShowTabBarComplete'], ['ShowTabBarRedDotOptions'], ['ShowTabBarRedDotSuccess'], ['ShowTabBarRedDotFail'], ['ShowTabBarRedDotComplete'], ['HideTabBarRedDotOptions'], ['HideTabBarRedDotSuccess'], ['HideTabBarRedDotFail'], ['HideTabBarRedDotComplete'], ['RemoveTabBarBadgeOptions'], ['RemoveTabBarBadgeSuccess'], ['RemoveTabBarBadgeFail'], ['RemoveTabBarBadgeComplete'], ['SetTabBarBadgeOptions'], ['SetTabBarBadgeSuccess'], ['SetTabBarBadgeFail'], ['SetTabBarBadgeComplete'], ['SetTabBarItemOptions'], ['SetTabBarItemSuccess'], ['SetTabBarItemFail'], ['SetTabBarItemComplete'], ['SetTabBarStyleOptions'], ['SetTabBarStyleSuccess'], ['SetTabBarStyleFail'], ['SetTabBarStyleComplete'], ['PageScrollToOptions'], ['PageScrollToSuccess'], ['PageScrollToFail'], ['PageScrollToComplete'], ['PageScrollToErrorCode'], ['AddInterceptorOptions'], ['RemoveInterceptorOptions'], ['SetNavigationBarColorOptions'], ['SetNavigationBarColorSuccess'], ['SetNavigationBarColorFail'], ['SetNavigationBarColorComplete'], ['SetNavigationBarTitleOptions'], ['SetNavigationBarTitleSuccess'], ['SetNavigationBarTitleFail'], ['SetNavigationBarTitleComplete'], ['ShowNavigationBarLoadingOptions'], ['ShowNavigationBarLoadingSuccess'], ['ShowNavigationBarLoadingFail'], ['HideNavigationBarLoadingOptions'], ['HideNavigationBarLoadingSuccess'], ['HideNavigationBarLoadingFail'], ['StartPullDownRefreshOptions'], ['StartPullDownRefreshSuccess'], ['StartPullDownRefreshFail'], ['StartPullDownRefreshComplete'], 
+        // 其他
+        ['CanvasRenderingContext2D'], ['requestAnimationFrame'], ['cancelAnimationFrame'], ['Image'], ['Path2D'], 
+        // copy from uni-preset
+        // ssr
+        ['ssrRef'], ['shallowSsrRef'], 
+        // uni-app lifecycle
+        // App and Page
+        ['onShow'], ['onHide'], 
+        // App
+        ['onLaunch'], ['onError'], ['onThemeChange'], ['onKeyboardHeightChange'], ['onPageNotFound'], ['onUnhandledRejection'], ['onLastPageBackPress'], ['onExit'], 
+        // Page
+        ['onPageShow'], ['onPageHide'], ['onLoad'], ['onReady'], ['onUnload'], ['onResize'], ['onBackPress'], ['onPageScroll'], ['onTabItemTap'], ['onReachBottom'], ['onPullDownRefresh'], ['OnBackPressOptions'], ['OnLaunchOptions'], ['OnLoadOptions'], ['OnPageScrollOptions'], ['OnResizeOptions'], 
+        // copy from vue-preset
+        // vue lifecycle
+        ['onActivated'], ['onBeforeMount'], ['onBeforeUnmount'], ['onBeforeUpdate'], ['onErrorCaptured'], ['onDeactivated'], ['onMounted'], ['onServerPrefetch'], ['onUnmounted'], ['onUpdated'], 
+        // setup helpers
+        ['useAttrs'], ['useSlots'], 
+        // reactivity,
+        ['computed'], ['customRef'], ['isReadonly'], ['isRef'], ['isProxy'], ['isReactive'], ['markRaw'], ['reactive'], ['readonly'], ['ref'], ['shallowReactive'], ['shallowReadonly'], ['shallowRef'], ['triggerRef'], ['toRaw'], ['toRef'], ['toRefs'], ['toValue'], ['unref'], ['watch'], ['watchEffect'], ['watchPostEffect'], ['watchSyncEffect'], 
+        // component
+        ['defineComponent'], ['defineAsyncComponent'], ['getCurrentInstance'], ['inject'], ['nextTick'], ['provide'], ['useCssModule'], ['createApp'], ['hasInjectionContext'], 
+        // render
+        ['h'], ['mergeProps'], ['cloneVNode'], ['isVNode'], ['resolveComponent'], ['resolveDirective'], ['withDirectives'], ['withModifiers'], 
+        // effect scope
+        ['effectScope'], ['EffectScope'], ['getCurrentScope'], ['onScopeDispose']);
+    }
+    const uniApiExportsPath = isX
+        ? '../lib/arkts/uni-api-exports-x.json'
+        : '../lib/arkts/uni-api-exports.json';
+    const externalModuleExportsPath = isX
+        ? '../lib/arkts/external-module-exports-x.json'
+        : '../lib/arkts/external-module-exports.json';
+    const internalModuleExportsPath = isX
+        ? '../lib/arkts/internal-module-exports-x.json'
+        : '../lib/arkts/internal-module-exports.json';
+    /**
+     * uni.api.ets
+     */
+    const uniApiExports = tryRequire(uniApiExportsPath);
+    /**
+     * uni-video、uni-canvas、uni-chooseLocation等内置component、api。uni_module目录下包含
+     */
+    const internalModuleExports = process.env.UNI_COMPILE_TARGET === 'ext-api' || !isX
+        ? {}
+        : tryRequire(internalModuleExportsPath);
+    /**
+     * uni-push等外部api
+     */
+    const externalModuleExports = process.env.UNI_COMPILE_TARGET === 'ext-api'
+        ? {}
+        : tryRequire(externalModuleExportsPath);
+    const autoImports = mergeArkTSAutoImports({
+        [runtimePackageName]: runtimeExports,
+    }, uniApiExports, internalModuleExports, externalModuleExports);
+    // TODO 引用的runtime包名根据内置外置切换
+    return autoImports;
+}
+exports.getArkTSAutoImports = getArkTSAutoImports;
+/**
+ * 将config.json内的依赖相对路径转为oh-package.json5的依赖相对路径
+ */
+function parsePackageDeps(deps) {
+    if (!deps) {
+        return;
+    }
+    const base = '/';
+    const result = {};
+    for (const key in deps) {
+        const value = deps[key];
+        if (value.startsWith('file:.') || value.startsWith('.')) {
+            const configRelativePath = value.replace(/^file:/, '');
+            const packageRelativePath = path_1.default
+                .relative(base, path_1.default.resolve(base, 'utssdk/app-harmony', configRelativePath))
+                .replace(/\\/g, '/');
+            result[key] = packageRelativePath.startsWith('.')
+                ? packageRelativePath
+                : './' + packageRelativePath;
+        }
+        else {
+            result[key] = value;
+        }
+    }
+    return result;
+}
+async function compileArkTSExtApi(rootDir, pluginDir, outputDir, { isExtApi, isX, isOhpmPackage = false, sourceMap, uni_modules, rewriteConsoleExpr, }) {
+    let filename = resolveAppHarmonyIndexFile(pluginDir);
+    if (!filename) {
+        // 如果有自定义组件，则使用自定义组件生成的index.uts
+        const customElements = (0, utils_1.resolveCustomElements)(pluginDir);
+        if (Object.keys(customElements).length === 0) {
+            return;
+        }
+        filename = path_1.default.resolve(pluginDir, 'utssdk/app-harmony/index.uts');
+    }
+    const runtimePackageName = getRuntimePackageName(isX);
+    const { bundle, UTSTarget } = (0, utils_1.getUTSCompiler)();
+    const pluginId = path_1.default.basename(pluginDir);
+    const outputUniModuleDir = outputDir;
+    let autoImportExternals = getArkTSAutoImports(isX);
+    if (isOhpmPackage) {
+        // 只保留uni-app-runtime
+        autoImportExternals = {
+            [runtimePackageName]: autoImportExternals[runtimePackageName],
+        };
+    }
+    const buildOptions = {
+        hbxVersion: process.env.HX_Version || process.env.UNI_COMPILER_VERSION,
+        input: {
+            root: rootDir,
+            filename: (0, utils_1.resolveBundleInputFileName)('app-harmony', filename),
+            paths: {
+                '@dcloudio/uni-runtime': runtimePackageName,
+            },
+            uniModules: uni_modules,
+            parseOptions: {
+                tsx: true,
+                noEarlyErrors: true,
+                allowComplexUnionType: true,
+                allowTsLitType: true,
+            },
+        },
+        output: {
+            outDir: outputUniModuleDir,
+            outFilename: 'utssdk/app-harmony/index.ets',
+            package: '',
+            imports: [],
+            sourceMap: sourceMap
+                ? path_1.default.resolve((0, utils_1.resolveUTSSourceMapPath)(), 'uni_modules', pluginId)
+                : false,
+            extname: '.ets',
+            logFilename: false,
+            isPlugin: true,
+            transform: {
+                autoImportExternals,
+                uniExtApiDefaultNamespace: '@dcloudio/uni-app-x-runtime',
+            },
+            treeshake: {
+                noSideEffects: true,
+            },
+        },
+    };
+    const configFilePath = path_1.default.resolve(pluginDir, 'utssdk/app-harmony/config.json');
+    const harmonyPackageName = '@uni_modules/' + pluginId.toLowerCase();
+    const harmonyModuleName = harmonyPackageName
+        .replace(/@/g, '')
+        .replace(/\//g, '__')
+        .replace(/-/g, '_');
+    // 拷贝所有ets、har文件
+    const etsFiles = (0, fast_glob_1.sync)('**/*.{ets,js,har}', {
+        cwd: pluginDir,
+    });
+    const depEtsFiles = [];
+    for (const etsFile of etsFiles) {
+        const srcFile = path_1.default.resolve(pluginDir, etsFile);
+        const destFile = path_1.default.resolve(outputUniModuleDir, etsFile);
+        if (/\.(ets|js)$/.test(etsFile)) {
+            depEtsFiles.push(srcFile);
+            if (rewriteConsoleExpr) {
+                const content = fs_extra_1.default.readFileSync(srcFile, 'utf8');
+                const newContent = rewriteConsoleExpr(srcFile, content);
+                fs_extra_1.default.outputFileSync(destFile, newContent);
+            }
+            else {
+                fs_extra_1.default.copySync(srcFile, destFile);
+            }
+        }
+        else {
+            fs_extra_1.default.copySync(srcFile, destFile);
+        }
+    }
+    // generate oh-package.json5
+    let version = '1.0.0';
+    const packageJsonPath = path_1.default.resolve(pluginDir, 'package.json');
+    if (fs_extra_1.default.existsSync(packageJsonPath)) {
+        const packageJson = fs_extra_1.default.readJSONSync(packageJsonPath);
+        version = packageJson.version || '1.0.0';
+    }
+    const ohPackageJson = {
+        name: harmonyPackageName,
+        version,
+        description: '',
+        main: 'utssdk/app-harmony/index.ets',
+        author: '',
+        license: '',
+        dependencies: (uni_modules || []).reduce((acc, dep) => {
+            acc['@uni_modules/' + dep.toLowerCase()] = '../' + dep;
+            return acc;
+        }, {}),
+    };
+    if (isOhpmPackage) {
+        ohPackageJson.description = 'uni-app runtime package';
+        ohPackageJson.author = 'DCloud';
+        ohPackageJson.license = 'Apache-2.0';
+    }
+    if (fs_extra_1.default.existsSync(configFilePath)) {
+        const config = fs_extra_1.default.readJSONSync(configFilePath);
+        ohPackageJson.dependencies = parsePackageDeps(config.dependencies);
+        ohPackageJson.dynamicDependencies = parsePackageDeps(config.dynamicDependencies);
+        ohPackageJson.devDependencies = parsePackageDeps(config.devDependencies);
+        ohPackageJson.overrides = parsePackageDeps(config.overrides);
+    }
+    fs_extra_1.default.outputJSONSync(path_1.default.resolve(outputUniModuleDir, 'oh-package.json5'), ohPackageJson, {
+        spaces: 2,
+    });
+    // copy resources
+    const resourcesDir = path_1.default.resolve(pluginDir, 'utssdk/app-harmony/resources');
+    if (fs_extra_1.default.existsSync(resourcesDir)) {
+        fs_extra_1.default.copySync(resourcesDir, path_1.default.resolve(outputUniModuleDir, 'src/main/resources'));
+    }
+    // TODO 以下文件用户可定制
+    // src/main/module.json5
+    const moduleJson5Path = path_1.default.resolve(pluginDir, 'utssdk/app-harmony/module.json5');
+    const defaultModuleJson5Module = {
+        name: harmonyModuleName,
+        type: 'har',
+        deviceTypes: ['default', 'tablet', '2in1'],
+    };
+    if (fs_extra_1.default.existsSync(moduleJson5Path)) {
+        // merge module.json5
+        const moduleJson5 = (0, shared_1.parseJson)(fs_extra_1.default.readFileSync(moduleJson5Path).toString('utf8'));
+        if (!moduleJson5.module) {
+            moduleJson5.module = defaultModuleJson5Module;
+        }
+        moduleJson5.module = Object.assign({}, defaultModuleJson5Module, moduleJson5.module);
+        fs_extra_1.default.outputJSONSync(path_1.default.resolve(outputUniModuleDir, 'src/main/module.json5'), moduleJson5, {
+            spaces: 2,
+        });
+    }
+    else {
+        fs_extra_1.default.outputJSONSync(path_1.default.resolve(outputUniModuleDir, 'src/main/module.json5'), {
+            module: defaultModuleJson5Module,
+        }, {
+            spaces: 2,
+        });
+    }
+    // build-profile.json5
+    fs_extra_1.default.outputJSONSync(path_1.default.resolve(outputUniModuleDir, 'build-profile.json5'), {
+        apiType: 'stageMode',
+        buildOption: {},
+        buildOptionSet: [],
+        targets: [
+            {
+                name: 'default',
+                config: {
+                    buildOption: {
+                        arkOptions: {
+                            runtimeOnly: {
+                                packages: [runtimePackageName],
+                            },
+                        },
+                    },
+                },
+            },
+        ],
+    }, {
+        spaces: 2,
+    });
+    // hvigorfile.ts
+    fs_extra_1.default.outputFileSync(path_1.default.resolve(outputUniModuleDir, 'hvigorfile.ts'), `import { harTasks } from '@ohos/hvigor-ohos-plugin';
+
+export default {
+    system: harTasks,  /* Built-in plugin of Hvigor. It cannot be modified. */
+    plugins:[]         /* Custom plugin to extend the functionality of Hvigor. */
+}`);
+    const result = await bundle(UTSTarget.ARKTS, buildOptions);
+    (0, utils_1.normalizeUTSResult)('app-harmony', result);
+    const deps = [filename, ...depEtsFiles];
+    if (process.env.NODE_ENV === 'development') {
+        if (result.deps) {
+            deps.push(...result.deps);
+        }
+    }
+    if (result.inject_apis && result.inject_apis.length) {
+        (0, utils_1.addPluginInjectApis)(result.inject_apis);
+    }
+    return {
+        code: requireUTSPluginCode(pluginId, !!isExtApi),
+        deps,
+        encrypt: true,
+        dir: outputUniModuleDir,
+        inject_apis: [],
+        scoped_slots: [],
+        custom_elements: {},
+    };
+}
+exports.compileArkTSExtApi = compileArkTSExtApi;
+async function compileArkTS(pluginDir, options) {
+    const inputDir = process.env.UNI_INPUT_DIR;
+    const pluginId = path_1.default.basename(pluginDir);
+    return compileArkTSExtApi((0, utils_1.resolveBundleInputRoot)('app-harmony', inputDir), pluginDir, resolveAppHarmonyUniModuleDir(pluginId), options);
+}
+exports.compileArkTS = compileArkTS;
+function requireUTSPluginCode(pluginId, _isExtApi) {
+    // 应该不需要返回uni，全都使用requireUTSPlugin即可，因为extApi也可能导出其他内容自己内部使用，比如map组件+createMapContext
+    // UNI_COMPILE_EXT_API_INPUT 是js-framework-next用来编译鸿蒙ext-api插件的js代码
+    // 此时不能返回uni，应该返回uni.requireUTSPlugin('uni_modules/${pluginId}')
+    // if (isExtApi && !process.env.UNI_COMPILE_EXT_API_INPUT) {
+    //   return `export default uni`
+    // }
+    return `export default uni.requireUTSPlugin('uni_modules/${pluginId}')`;
+}
+exports.requireUTSPluginCode = requireUTSPluginCode;
+function resolveAppHarmonyIndexFile(pluginDir) {
+    let indexFile = path_1.default.resolve(pluginDir, 'utssdk/app-harmony/index.uts');
+    if (fs_extra_1.default.existsSync(indexFile)) {
+        return indexFile;
+    }
+    indexFile = path_1.default.resolve(pluginDir, 'utssdk/index.uts');
+    if (fs_extra_1.default.existsSync(indexFile)) {
+        return indexFile;
+    }
+}
+function resolveAppHarmonyUniModulesRootDir() {
+    if (process.env.UNI_APP_HARMONY_PROJECT_PATH) {
+        return path_1.default.resolve(process.env.UNI_APP_HARMONY_PROJECT_PATH, 'uni_modules');
+    }
+    return path_1.default.resolve(process.env.UNI_OUTPUT_DIR, 'uni_modules');
+}
+exports.resolveAppHarmonyUniModulesRootDir = resolveAppHarmonyUniModulesRootDir;
+function resolveAppHarmonyUniModuleDir(pluginId) {
+    return path_1.default.resolve(resolveAppHarmonyUniModulesRootDir(), pluginId);
+}
+exports.resolveAppHarmonyUniModuleDir = resolveAppHarmonyUniModuleDir;
+function resolveAppHarmonyUniModulesEntryDir() {
+    if (process.env.UNI_APP_HARMONY_PROJECT_PATH) {
+        return path_1.default.resolve(process.env.UNI_APP_HARMONY_PROJECT_PATH, 'entry/src/main/ets/uni_modules');
+    }
+    return path_1.default.resolve(process.env.UNI_OUTPUT_DIR, 'uni_modules');
+}
+exports.resolveAppHarmonyUniModulesEntryDir = resolveAppHarmonyUniModulesEntryDir;

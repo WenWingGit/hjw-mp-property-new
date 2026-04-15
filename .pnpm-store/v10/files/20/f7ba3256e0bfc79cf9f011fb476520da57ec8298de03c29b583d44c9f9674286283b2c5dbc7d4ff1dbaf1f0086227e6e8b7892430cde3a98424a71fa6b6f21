@@ -1,0 +1,23 @@
+'use strict';
+
+const presetApplet = require('@unocss-applet/preset-applet');
+const presetRemRpx = require('@unocss-applet/preset-rem-rpx');
+const transformerAttributify = require('@unocss-applet/transformer-attributify');
+const transformerApplet = require('@unocss-applet/transformer-applet');
+
+function _interopDefaultCompat (e) { return e && typeof e === 'object' && 'default' in e ? e.default : e; }
+
+const transformerApplet__default = /*#__PURE__*/_interopDefaultCompat(transformerApplet);
+
+
+
+exports.transformerApplet = transformerApplet__default;
+Object.keys(presetApplet).forEach(function (k) {
+	if (k !== 'default' && !Object.prototype.hasOwnProperty.call(exports, k)) exports[k] = presetApplet[k];
+});
+Object.keys(presetRemRpx).forEach(function (k) {
+	if (k !== 'default' && !Object.prototype.hasOwnProperty.call(exports, k)) exports[k] = presetRemRpx[k];
+});
+Object.keys(transformerAttributify).forEach(function (k) {
+	if (k !== 'default' && !Object.prototype.hasOwnProperty.call(exports, k)) exports[k] = transformerAttributify[k];
+});

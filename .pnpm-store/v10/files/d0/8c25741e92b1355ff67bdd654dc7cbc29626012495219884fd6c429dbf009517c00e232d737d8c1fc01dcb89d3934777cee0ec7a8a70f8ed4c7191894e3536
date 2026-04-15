@@ -1,0 +1,19 @@
+import { Preset } from 'unocss';
+import { PresetUnoOptions, Theme } from '@unocss/preset-uno';
+
+interface PresetAppletOptions extends PresetUnoOptions {
+    /**
+     * Unsupported characters in applet, will be added to the default value
+     * @default ['.', ':', '%', '!', '#', '(', ')', '[', '/', ']', ',', '$', '{', '}', '@', '+', '^', '&', '<', '>', '\'', '\\']
+     */
+    unsupportedChars?: string[];
+    /**
+     * Space Between and Divide Width Elements
+     * @default ['view', 'button', 'text', 'image']
+     */
+    betweenElements?: string[];
+}
+
+declare function presetApplet(options?: PresetAppletOptions): Preset<Theme>;
+
+export { type PresetAppletOptions, presetApplet as default, presetApplet };

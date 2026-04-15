@@ -1,0 +1,219 @@
+declare const RESOURCES: {
+    "zh-CN-lowercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-CN-uppercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-TW-lowercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-TW-uppercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-HK-lowercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-HK-uppercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+};
+
+type LanguageType = keyof typeof RESOURCES;
+type ChineseNumericType = {
+    digitsList?: string[];
+    magnitudeList?: string[];
+    baseNumerals?: string[];
+    minusSign?: string;
+    decimalPoint?: string;
+};
+interface NumberToZhOptions extends ChineseNumericType {
+    language?: LanguageType;
+    skipOneBeforeTen?: boolean;
+    /**
+     * @default "WW"
+     * @description 启用万亿情况下，重复的数级
+     */
+    repeatChar?: false | "WW" | "YY";
+    /**
+     * @default 8
+     * @description 超过万位 10^8，分节长度
+     */
+    digitsAboveTenThousand?: 4 | "Quaternary" | 8 | "Octal";
+    /**
+     * @default _
+     * @description 字符串数字中支持原生数字分节
+     */
+    numericUnderscores?: string;
+    /**
+     * @default false
+     * @description 数级后面的千位不是零，数级前面的个位是零，零加在数级的「前」面，正常情况是省略的。
+     * @example 205000 => 二十{零}万五千
+     */
+    hangingZerosBeforeDigits?: boolean;
+    /**
+     * @default false
+     * @description 数级后面的千位不是零，数级前面的个位是零，零加在数级的「后」面，人民银行规定的错误写法。
+     * @example 205000 => 二十万{零}五千
+     */
+    hangingZerosAfterDigits?: boolean;
+}
+
+declare function checkCharacters(targetString: string, comparisonString: string): boolean;
+
+interface ZhToNumberOptions extends ChineseNumericType {
+    thousandsSeparator?: boolean;
+    language?: LanguageType;
+    positive?: string;
+}
+
+declare function resolveOptions$2(options: ZhToNumberOptions): {
+    thousandsSeparator: boolean;
+    digitsList: string[];
+    magnitudeList: string[];
+    baseNumerals: string[];
+    minusSign: string;
+    decimalPoint: string;
+    positive: string;
+};
+
+declare function zhToNumber(inputNumberString: string, options?: ZhToNumberOptions): string | number;
+
+interface ZhCurrencyToNumberOptions extends ZhToNumberOptions {
+    /**
+     * @description 辅币单位
+     */
+    fractionalCurrencyUnit?: string[];
+    /**
+     * @description 阿拉伯数字前面的人民币符号
+     */
+    prefixSymbol?: string;
+    /**
+     * @description 中文金额前缀「人民币」
+     */
+    amountPrefix?: string;
+    /**
+     * @default 圆
+     * @description 人民币单位
+     */
+    CNYUnit?: string;
+    /**
+     * @default 整
+     * @description 大写金额后缀正或者整
+     */
+    amountSuffix?: string;
+}
+
+interface NumberToZhCurrencyOptions extends NumberToZhOptions {
+    /**
+     * @default true
+     * @description 金额在角位结束时，是否添加「正｜整」
+     */
+    tenCentsSuffix?: boolean;
+    /**
+     * @default false
+     * @description 元位是 0，但角位不是 0，是否保留中文零
+     */
+    preserveOnesPlaceZero?: boolean;
+    /**
+     * @description 辅币单位
+     */
+    fractionalCurrencyUnit?: string[];
+    /**
+     * @description 阿拉伯数字前面的人民币符号
+     */
+    prefixSymbol?: string;
+    /**
+     * @description 中文金额前缀「人民币」
+     */
+    amountPrefix?: string;
+    /**
+     * @default 圆
+     * @description 人民币单位
+     */
+    CNYUnit?: string;
+    /**
+     * @default 整
+     * @description 大写金额后缀正或者整
+     */
+    amountSuffix?: string;
+}
+
+declare const FRACTIONAL_CURRENCY_UNIT: string[];
+declare const AMOUNT_PREFIX = "\u4EBA\u6C11\u5E01";
+declare const PREFIX_SYMBOL = "\u00A5";
+declare const CNY_UNIT = "\u5706";
+declare const AMOUNT_SUFFIX = "\u6574";
+
+declare function resolveOptions$1(options: NumberToZhCurrencyOptions): {
+    hangingZerosAfterDigits: boolean;
+    numericUnderscores: string;
+    skipOneBeforeTen: boolean;
+    digitsAboveTenThousand: 4 | 8;
+    repeatChar: false | "WW" | "YY";
+    hangingZerosBeforeDigits: boolean;
+    digitsList: string[];
+    magnitudeList: string[];
+    baseNumerals: string[];
+    minusSign: string;
+    decimalPoint: string;
+    tenCentsSuffix: boolean;
+    preserveOnesPlaceZero: boolean;
+    fractionalCurrencyUnit: string[];
+    prefixSymbol: string;
+    amountPrefix: string;
+    CNYUnit: string;
+    amountSuffix: string;
+};
+
+declare function zhCurrencyToNumber(inputNumberString: string, options?: ZhCurrencyToNumberOptions): string | number;
+
+type ResolveOptionsType = ReturnType<typeof resolveOptions>;
+declare function resolveOptions(options: ZhCurrencyToNumberOptions): {
+    thousandsSeparator: boolean;
+    digitsList: string[];
+    magnitudeList: string[];
+    baseNumerals: string[];
+    minusSign: string;
+    decimalPoint: string;
+    positive: string;
+    fractionalCurrencyUnit: string[];
+    prefixSymbol: string;
+    amountPrefix: string;
+    CNYUnit: string;
+    amountSuffix: string;
+};
+
+declare function parseZhCurrency(num: number | string, options: ResolveOptionsType): {
+    sign: string;
+    integerPart: string;
+    fractionalPart: string;
+};
+
+var version = "0.0.1";
+
+export { AMOUNT_PREFIX, AMOUNT_SUFFIX, CNY_UNIT, type ChineseNumericType, FRACTIONAL_CURRENCY_UNIT, type LanguageType, PREFIX_SYMBOL, type ResolveOptionsType, type ZhCurrencyToNumberOptions, type ZhToNumberOptions, checkCharacters, parseZhCurrency, resolveOptions$1 as resolveNumberToZhCurrency, resolveOptions, resolveOptions$2 as resolveZhToNumberOptions, version, zhCurrencyToNumber, zhToNumber };
