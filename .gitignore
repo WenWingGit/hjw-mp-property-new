@@ -38,3 +38,4 @@ dist
 # npx @dcloudio/uvm@latest
 
 /unpackage/resources
+.pnpm-store/*
