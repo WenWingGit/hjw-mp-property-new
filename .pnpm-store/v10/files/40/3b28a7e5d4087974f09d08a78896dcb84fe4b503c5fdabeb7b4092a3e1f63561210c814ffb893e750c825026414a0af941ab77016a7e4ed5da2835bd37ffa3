@@ -1,0 +1,35 @@
+/**
+ * number-zh 0.0.1
+ * Author Condor Hero
+ * License MIT
+ * ©️ 2023
+ * Homepage https://github.com/condorheroblog/number-zh/blob/main/README.md
+ */
+
+import { numberToZh } from 'number-to-zh';
+import { zhToNumber } from 'zh-to-number';
+import { numberToZhCurrency } from 'number-to-zh-currency';
+import { zhCurrencyToNumber } from 'zh-currency-to-number';
+
+var version = "0.0.1";
+
+class NumberZh {
+  comprehensiveOptions = {};
+  constructor(comprehensiveOptions = {}) {
+    this.comprehensiveOptions = comprehensiveOptions;
+  }
+  numberToZh(num, personalizationOptions = {}) {
+    return numberToZh(num, { ...this.comprehensiveOptions, ...personalizationOptions });
+  }
+  numberToZhCurrency(num, personalizationOptions = {}) {
+    return numberToZhCurrency(num, { ...this.comprehensiveOptions, ...personalizationOptions });
+  }
+  zhCurrencyToNumber(inputNumberString, personalizationOptions = {}) {
+    return zhCurrencyToNumber(inputNumberString, { ...this.comprehensiveOptions, ...personalizationOptions });
+  }
+  zhToNumber(inputNumberString, personalizationOptions = {}) {
+    return zhToNumber(inputNumberString, { ...this.comprehensiveOptions, ...personalizationOptions });
+  }
+}
+
+export { NumberZh, version };

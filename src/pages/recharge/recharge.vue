@@ -315,14 +315,14 @@ const handleNavToScanPay = () => {
 // 导航到充值记录
 const handleNavToPayRecord = () => {
   uni.navigateTo({
-    url: '/pages/111/payRecord/payRecord',
+    url: '/pages/rechargeRecord/rechargeRecord',
   })
 }
 
 // 导航到支付记录
 const handleNavToPaymentRecord = () => {
   uni.navigateTo({
-    url: '/pages/mine/paymentRecord/paymentRecord',
+    url: '/pages/paymentRecord/paymentRecord',
   })
 }
 

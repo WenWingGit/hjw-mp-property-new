@@ -1,0 +1,17 @@
+export interface GenerateRuntimeCodeFrameOptions {
+    cacheDir: string;
+    logType?: 'log' | 'info' | 'warn' | 'debug' | 'error';
+}
+export declare const COLORS: Record<string, string>;
+export declare const splitRE: RegExp;
+export declare function resolveSourceMapDirByCacheDir(cacheDir: string): string;
+export declare function resolveSourceMapFileBySourceFile(file: string, sourceMapDir: string): string | undefined;
+export declare function lineColumnToStartEnd(source: string, line: number, column: number): {
+    start: number;
+    end: number;
+};
+export declare function generateCodeFrame(source: string, start?: number | {
+    line: number;
+    column: number;
+}, end?: number): string;
+export declare function parseRelativeSourceFile(sourceFile: string, sourceRoot?: string | null): string;

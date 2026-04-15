@@ -1,0 +1,38 @@
+{
+  "name": "@unocss-applet/transformer-attributify",
+  "type": "module",
+  "version": "0.7.8",
+  "description": "Attributify Mode for [UnoCSS](https://github.com/unocss/unocss).",
+  "author": "Neil Lee <zguolee@foxmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/unocss-applet/unocss-applet/tree/main/packages/transformer-attributify#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unocss-applet/unocss-applet.git",
+    "directory": "packages/transformer-attributify"
+  },
+  "bugs": "https://github.com/unocss-applet/unocss-applet/issues",
+  "keywords": [
+    "unocss",
+    "unocss-transformer"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./*": "./*"
+  },
+  "main": "dist/index.cjs",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "stub": "unbuild --stub"
+  },
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts"
+}

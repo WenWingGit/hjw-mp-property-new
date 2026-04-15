@@ -1,0 +1,227 @@
+declare global {
+
+  // TODO 这两个应该在 @vue/runtime-vapor-dom2 中
+  type UniElementBlock = unknown
+  type UniNativeViewBlock = unknown
+
+  type UniSharedDataJSONObject = Record<string, any | null>
+  type UniSharedDataArray = Array<UniSharedDataAny>
+
+  type UniSharedDataAny =
+    | boolean
+    | number
+    | string
+    | null
+    | UniSharedData
+    | UniSharedDataJSONObject
+    | UniSharedDataArray
+    | UniSharedDataFunctionEventListener
+    | UniSharedDataFunctionSetTemplateRef
+
+  type UniSharedDataFunctionEventListener = (
+    event: /* UniSharedDataEvent */ UniEvent,
+  ) => void
+  type UniSharedDataFunctionSetTemplateRef = (elementId: number) => void
+
+  enum UniSharedDataSchedulerJobType {
+    /**
+     * 各种渲染任务，比如设置属性，样式，更新文字等
+     */
+    RENDER_EFFECT,
+    /**
+     * v-if 任务
+     */
+    V_IF,
+    /**
+     * v-for 任务
+     */
+    V_FOR,
+  }
+
+  type UniSharedDataSchedulerJob = {
+    // 指定线程执行
+    thread?: string
+    type: UniSharedDataSchedulerJobType
+  }
+
+  class UniSharedDataEvent {
+    /**
+     * 事件是否冒泡
+     */
+    bubbles: boolean
+    /**
+     * 事件是否可取消
+     */
+    cancelable: boolean
+    /**
+     * 事件类型
+     */
+    type: string
+    /**
+     * 触发事件的节点ID
+     */
+    target: string
+    /**
+     * 注册事件的节点ID
+     */
+    currentTarget: string
+    /**
+     * 事件创建的时间
+     */
+    timeStamp: number
+  }
+
+  class UniSharedData {
+    _flag0: number
+    /**
+     * ArkTS 层数据缓存，主要用于 ArkTS 层判断属性值是否有变化
+     */
+    _cacheProps: Map<string, UniSharedDataAny>
+    /**
+     * 是否已初始化完成，主要用于二次更新时触发响应式
+     */
+    _ready: boolean
+    /**
+     * 所属页面，用于批量执行响应式变更
+     */
+    _scope: UniSharedDataPage
+    /**
+     * 属性变更时收集 Jobs
+     */
+    _queueJobs: (key: string, value: UniSharedDataAny) => void
+    constructor(scope: UniSharedDataPage)
+  }
+
+  abstract class UniSharedDataComponent extends UniSharedData {
+    _page: UniPage
+    _reactivity: VueReactivity
+    /**
+     * 自定义组件需要透传的属性
+     */
+    inheritAttrs: UniSharedDataJSONObject
+    constructor(scope: UniSharedDataPage)
+    /**
+     * 由编译器动态生成的子类中的 Element 渲染器
+     */
+    abstract _renderElement(): UniElementBlock
+    /**
+     * 由编译器动态生成的子类中的 NativeView 渲染器
+     */
+    abstract _renderNativeView(): UniNativeViewBlock
+  }
+
+  abstract class UniSharedDataPage extends UniSharedDataComponent {
+    /**
+     * ArkTS 层存储的事件映射，key 为事件 ID，value 为事件函数，用于触发事件时执行
+     */
+    _cacheEvents: Map<number, Function>
+    /**
+     * 本次更新收集到的 Jobs，用于批量执行响应式变更
+     */
+    _jobs: Array<Array<UniSharedDataSchedulerJob[]>>
+    /**
+     * 批量执行响应式变更
+     */
+    _flushJobs: () => Promise<void> | void
+    /**
+     * c 层触发事件，调用 $cacheEvents 中存储的 ArkTS 层事件函数
+     */
+    _dispatchEvent: (id: number, event: UniSharedDataEvent) => void
+    /**
+     * 页面渲染函数
+     * 调用页面的 _renderElement 和 _renderNativeView
+     * 执行 Element 渲染器（子线程执行）和 NativeView 渲染器（主线程执行）
+     * 拿到两个渲染器执行后的 Block 后，插入到页面的根 NativeView 和根 Dom元素中
+     * 页面的根 NativeView，根 Dom 从哪里获取？
+     * 在 c 层实现一个简易的 UniPage？
+     * 在页面的 SharedData 类构造器里边，构建对应的 UniPage 对象？
+     */
+    _render: () => Promise<void>
+  }
+
+  enum UniSharedDataVForDirty {
+    /**
+     * 无变更
+     */
+    NONE,
+    /**
+     * 快速变更模式，读取 mount、unmount、update的列表，进行快速更新
+     */
+    FAST,
+    /**
+     * 全量模式，触发数组全量diff更新
+     */
+    FULL,
+  }
+
+  class UniSharedDataVForMount {
+    readonly index: number
+    constructor(index: number)
+  }
+
+  class UniSharedDataVForUnmount {
+    readonly index: number
+    readonly doRemove: boolean
+    readonly doDeregister: boolean
+    constructor(
+      /**
+       * 需要移除的索引值
+       * 重要：该索引值是oldBlocks中的索引值
+       */
+      index: number,
+      doRemove: boolean,
+      doDeregister: boolean,
+    )
+  }
+
+  class UniSharedDataVForUpdate {
+    readonly index: number
+    constructor(
+      /**
+       * 需要更新的索引值
+       * update((newBlocks[i] = oldBlocks[i]), getItem(source, i))
+       */
+      index: number,
+    )
+  }
+
+  class UniSharedDataVFor<T extends UniSharedData> extends UniSharedData {
+    data: T[]
+    mount: UniSharedDataVForMount[]
+    unmount: UniSharedDataVForUnmount[]
+    update: UniSharedDataVForUpdate[]
+    dirty: UniSharedDataVForDirty
+    create: () => T
+    constructor(scope: UniSharedDataPage, create: () => T)
+  }
+
+  class VueReactivity { }
+
+  // 编译宏
+
+
+  interface UniSharedDataRegistry { }
+
+  type InferSharedData<
+    T,
+    R extends UniSharedData = UniSharedData,
+  > = T extends keyof UniSharedDataRegistry ? UniSharedDataRegistry[T] : R
+
+  function useSharedData<T extends string>(
+    scope: UniSharedDataPage,
+  ): InferSharedData<T>
+
+  function useSharedDataPage<T extends string>(
+    pageId: number,
+  ): InferSharedData<T, UniSharedDataPage>
+
+  function useSharedDataComponent<T extends string>(
+    scope: UniSharedDataPage,
+  ): InferSharedData<T, UniSharedDataComponent>
+
+  function useSharedDataVFor<T, S extends UniSharedData>(
+    sharedDataVFor: S,
+  ): S
+}
+
+export { }

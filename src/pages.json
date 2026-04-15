@@ -89,10 +89,30 @@
       "layout": "noSideDefault"
     },
     {
+      "path": "pages/paymentRecord/paymentRecord",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "支付记录",
+        "hidesTabBar": true,
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
       "path": "pages/recharge/recharge",
       "type": "page",
       "style": {
         "navigationBarTitleText": "预缴物业费",
+        "hidesTabBar": true,
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/rechargeRecord/rechargeRecord",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "充值记录",
         "hidesTabBar": true,
         "navigationStyle": "custom",
         "navigationBarTextStyle": "white"

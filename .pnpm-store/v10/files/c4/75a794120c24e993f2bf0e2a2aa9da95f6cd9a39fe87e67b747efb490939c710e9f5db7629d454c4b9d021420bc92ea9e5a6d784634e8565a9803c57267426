@@ -1,0 +1,22 @@
+import { Preset } from 'unocss';
+
+interface RemRpxOptions {
+    /**
+     * 1rem = n px
+     * @default 16
+     */
+    baseFontSize?: number;
+    /**
+     * screen width in px
+     * @default 375
+     */
+    screenWidth?: number;
+    /**
+     * rem to rpx or rpx to rem
+     * @default 'rem2rpx'
+     */
+    mode?: 'rem2rpx' | 'rpx2rem';
+}
+declare function presetRemRpx(options?: RemRpxOptions): Preset;
+
+export { type RemRpxOptions, presetRemRpx as default, presetRemRpx };

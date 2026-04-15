@@ -1,0 +1,87 @@
+var version = "0.0.1";
+
+declare function checkCharacters(targetString: string, comparisonString: string): boolean;
+
+declare function stringAddition(string1: string, string2: string): string;
+
+declare const RESOURCES: {
+    "zh-CN-lowercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-CN-uppercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-TW-lowercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-TW-uppercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-HK-lowercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+    "zh-HK-uppercase": {
+        digitsList: string[];
+        magnitudeList: string[];
+        minusSign: string;
+        decimalPoint: string;
+        baseNumerals: string[];
+    };
+};
+
+type LanguageType = keyof typeof RESOURCES;
+type ChineseNumericType = {
+    digitsList?: string[];
+    magnitudeList?: string[];
+    baseNumerals?: string[];
+    minusSign?: string;
+    decimalPoint?: string;
+};
+
+interface ZhToNumberOptions extends ChineseNumericType {
+    thousandsSeparator?: boolean;
+    language?: LanguageType;
+    positive?: string;
+}
+
+declare function resolveOptions(options: ZhToNumberOptions): {
+    thousandsSeparator: boolean;
+    digitsList: string[];
+    magnitudeList: string[];
+    baseNumerals: string[];
+    minusSign: string;
+    decimalPoint: string;
+    positive: string;
+};
+
+declare function parseZhNumber(str: string, minusSign: string, decimalPoint: string): {
+    sign: string;
+    integerPart: string;
+    fractionalPart: string;
+};
+
+declare function zhToNumber(inputNumberString: string, options?: ZhToNumberOptions): string | number;
+
+declare const positive = "\u6B63";
+
+export { type ChineseNumericType, type LanguageType, RESOURCES, type ZhToNumberOptions, checkCharacters, parseZhNumber, positive, resolveOptions, stringAddition, version, zhToNumber };

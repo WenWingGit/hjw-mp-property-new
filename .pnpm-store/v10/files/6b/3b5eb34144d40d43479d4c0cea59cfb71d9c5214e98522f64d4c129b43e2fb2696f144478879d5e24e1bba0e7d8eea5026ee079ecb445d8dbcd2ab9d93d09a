@@ -1,0 +1,40 @@
+/**
+ * 通用类型定义
+ */
+
+/**
+ * 基础类型position：left/top
+ */
+export type UniPosition = {
+  left: number,
+  top: number,
+}
+
+/**
+ * 基础类型size：width/height
+ */
+export type UniSize = {
+  width: number,
+  height: number,
+}
+
+/**
+ * 基础类型：left/top/width/height
+ */
+export type UniLTWH = {
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+}
+
+/**
+ * 基础类型：left/top/right/bottom
+ */
+export type UniLTRB = {
+  left: number,
+  top: number,
+  right: number,
+  bottom: number,
+}
+

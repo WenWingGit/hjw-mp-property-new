@@ -1,0 +1,18 @@
+// 本文件为自动构建生成
+export {
+  UniShowModalResult,
+  ShowModalResult,
+  ShowModalErrorCode,
+  UniShowModalFail,
+  ShowModalFail,
+  ShowModalOptions,
+  ShowModal,
+  ModalPage,
+  UniHideModalResult,
+  HideModalResult,
+  HideModalErrorCode,
+  UniHideModalFail,
+  HideModalFail,
+  HideModalOptions,
+  HideModal,
+} from './interface'

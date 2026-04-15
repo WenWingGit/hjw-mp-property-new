@@ -1,0 +1,104 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createUniXCompiler = void 0;
+const path_1 = __importDefault(require("path"));
+const debug_1 = __importDefault(require("debug"));
+const sourceMap_1 = require("../sourceMap");
+const shared_1 = require("../shared");
+const utils_1 = require("../utils");
+const debugTscWatcher = (0, debug_1.default)('uts:tsc:watcher');
+function createUniXCompiler(mode, targetLanguage, options) {
+    const inputDir = (0, shared_1.normalizePath)(options.inputDir);
+    const utsLibDir = path_1.default.resolve(__dirname, '../../lib');
+    const pluginPath = process.env.UNI_HBUILDERX_PLUGINS
+        ? process.env.UNI_HBUILDERX_PLUGINS
+        : path_1.default.resolve(process.cwd(), '../');
+    const hxLanguageServiceDir = path_1.default.resolve(pluginPath, 'hbuilderx-language-services');
+    const tsFactory = require(path_1.default.resolve(utsLibDir, 'typescript/lib/typescript.factory.js'));
+    const fileWatcher = new UTSFileWatcher({
+        tscDir: inputDir,
+        inputDir: process.env.UNI_INPUT_DIR,
+    });
+    const watchFile = (fileName, callback, pollingInterval, options) => {
+        // 仅监听工程目录内的文件
+        if (fileName.startsWith(inputDir)) {
+            return fileWatcher.watchFile(fileName, callback, pollingInterval, options);
+        }
+        return {
+            close() {
+                /* noop */
+            },
+        };
+    };
+    const sourceMap = process.env.UNI_APP_SOURCEMAP === 'true' ||
+        process.env.NODE_ENV === 'development';
+    const compilerOptions = {
+        mode,
+        targetLanguage: targetLanguage,
+        tsFactory,
+        paths: options.paths,
+        utsLibDir,
+        hxLanguageServiceDir,
+        sourceMap,
+        inlineSources: sourceMap,
+        originalPositionForSync: sourceMap_1.originalPositionForSync,
+        watchFile,
+        incremental: mode === 'development',
+        transformOptions: {
+            enableUTSNumber: false,
+            enableNarrowType: true, // 默认开启
+            enableGenericsParameterDefaults: (0, utils_1.isEnableGenericsParameterDefaults)(),
+        },
+        ...options,
+    };
+    const { UniXCompiler } = require('../../lib/uni-x/dist/compiler');
+    const compiler = new UniXCompiler(compilerOptions);
+    compiler.invalidate = (files) => {
+        let timeout = 300;
+        for (const { fileName, event } of files) {
+            if (fileWatcher.onWatchFileChange(fileName, event)) {
+                timeout = 2000;
+            }
+        }
+        return compiler.wait(timeout);
+    };
+    return compiler;
+}
+exports.createUniXCompiler = createUniXCompiler;
+const replacements = /(\.uts|\.uvue|\.vue|\.json)\.ts$/;
+class UTSFileWatcher {
+    constructor({ tscDir, inputDir }) {
+        this._watchFiles = new Map();
+        this._tscDir = tscDir;
+        this._inputDir = inputDir;
+    }
+    watchFile(fileName, callback, pollingInterval, options) {
+        // 此时记录的是emit出来的.tsc目录的文件
+        const key = (0, shared_1.normalizePath)(path_1.default.relative(this._tscDir, fileName).replace(replacements, '$1'));
+        this._watchFiles.set(key, { fileName, callback });
+        return {
+            close: () => {
+                this._watchFiles.delete(key);
+            },
+        };
+    }
+    onWatchFileChange(fileName, event) {
+        const relativeFileName = (0, shared_1.normalizePath)(path_1.default.relative(this._inputDir, fileName));
+        const watcher = this._watchFiles.get(relativeFileName);
+        if (watcher) {
+            // Created = 0,
+            // Changed = 1,
+            // Deleted = 2,
+            debugTscWatcher(relativeFileName, event);
+            watcher.callback(watcher.fileName, event === 'update' ? 1 : event === 'delete' ? 2 : 0);
+            return true;
+        }
+        else {
+            debugTscWatcher(relativeFileName, ' not found');
+        }
+        return false;
+    }
+}

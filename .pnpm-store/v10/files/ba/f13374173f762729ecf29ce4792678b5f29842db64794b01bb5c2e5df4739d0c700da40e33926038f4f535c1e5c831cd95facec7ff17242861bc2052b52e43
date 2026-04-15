@@ -1,0 +1,354 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.parseUTSKotlinRuntimeStacktrace = exports.resolveUTSKotlinFilenameByClassName = exports.parseFilenameByClassName = exports.updateUTSKotlinSourceMapManifestCache = exports.parseUTSKotlinStacktrace = exports.hbuilderFormatter = void 0;
+const path_1 = __importDefault(require("path"));
+const fs_extra_1 = __importDefault(require("fs-extra"));
+const utils_1 = require("../utils");
+const sourceMap_1 = require("../sourceMap");
+const utils_2 = require("./utils");
+const shared_1 = require("../shared");
+function hbuilderFormatter(m) {
+    const msgs = [];
+    if (m.type === 'error' || m.type === 'exception') {
+        m.message = formatKotlinError(m.message, [], compileFormatters);
+    }
+    let msg = m.type + ': ' + m.message;
+    if (m.type === 'warning') {
+        // 忽略部分警告
+        if (msg.includes(`Classpath entry points to a non-existent location:`) &&
+            !msg.includes('.gradle') // gradle 的警告需要输出
+        ) {
+            return '';
+        }
+        msg
+            .replace(/\r\n/g, '\n')
+            .split('\n')
+            .forEach((m, index) => {
+            // 重要：区块标识需要放到颜色值之后
+            msgs.push('\u200B' +
+                (index === 0 ? utils_1.SPECIAL_CHARS.WARN_BLOCK : '') +
+                m +
+                '\u200B');
+        });
+    }
+    else if (m.type === 'error' || m.type === 'exception') {
+        msg
+            .replace(/\r\n/g, '\n')
+            .split('\n')
+            .forEach((m, index) => {
+            // 重要：区块标识需要放到颜色值之后
+            msgs.push('\u200C' +
+                (index === 0 ? utils_1.SPECIAL_CHARS.ERROR_BLOCK : '') +
+                m +
+                '\u200C');
+        });
+    }
+    else {
+        msgs.push(msg);
+    }
+    if (m.file) {
+        if (m.file.includes('?')) {
+            ;
+            [m.file] = m.file.split('?');
+        }
+        msgs.push(`at ${m.file}:${m.line}:${m.column}`);
+    }
+    if (m.code) {
+        msgs.push(m.code);
+    }
+    return msgs.join('\n');
+}
+exports.hbuilderFormatter = hbuilderFormatter;
+async function parseUTSKotlinStacktrace(messages, options) {
+    if (typeof messages === 'string') {
+        try {
+            messages = JSON.parse(messages);
+        }
+        catch (e) { }
+    }
+    const msgs = [];
+    if (Array.isArray(messages) && messages.length) {
+        for (const m of messages) {
+            if (m.file) {
+                const sourceMapFile = resolveSourceMapFile(m.file, options.sourceMapDir, options.inputDir);
+                if (sourceMapFile) {
+                    const originalPosition = await (0, sourceMap_1.originalPositionFor)({
+                        sourceMapFile,
+                        line: m.line,
+                        column: m.column,
+                        withSourceContent: true,
+                    });
+                    if (originalPosition.source) {
+                        // 混编的假sourcemap，需要读取源码
+                        if (sourceMapFile.endsWith('.fake.map')) {
+                            if (fs_extra_1.default.existsSync(m.file)) {
+                                originalPosition.sourceContent = fs_extra_1.default.readFileSync(m.file, 'utf-8');
+                            }
+                        }
+                        m.file = originalPosition.source.split('?')[0];
+                        if (originalPosition.line !== null) {
+                            m.line = originalPosition.line;
+                        }
+                        if (originalPosition.column !== null) {
+                            m.column = originalPosition.column;
+                        }
+                        if (originalPosition.line !== null &&
+                            originalPosition.column !== null &&
+                            originalPosition.sourceContent) {
+                            m.code = (0, utils_2.generateCodeFrame)(originalPosition.sourceContent, {
+                                line: originalPosition.line,
+                                column: originalPosition.column,
+                            }).replace(/\t/g, ' ');
+                        }
+                    }
+                }
+            }
+            let msg = options.format(m);
+            if (msg) {
+                if (m.type === 'error' || m.type === 'exception') {
+                    msg = msg + utils_1.SPECIAL_CHARS.ERROR_BLOCK;
+                }
+                else if (m.type === 'warning') {
+                    msg = msg + utils_1.SPECIAL_CHARS.WARN_BLOCK;
+                }
+                msgs.push(msg);
+            }
+        }
+    }
+    return msgs.join('\n');
+}
+exports.parseUTSKotlinStacktrace = parseUTSKotlinStacktrace;
+function resolveSourceMapFile(file, sourceMapDir, inputDir) {
+    const sourceMapFile = path_1.default.resolve(sourceMapDir, (0, utils_1.relative)(file, inputDir) + '.map');
+    if (fs_extra_1.default.existsSync(sourceMapFile)) {
+        return sourceMapFile;
+    }
+    return (0, shared_1.normalizePath)((0, utils_1.relative)(file, inputDir)) + '.fake.map';
+}
+const DEFAULT_APPID = '__UNI__uniappx';
+function normalizeAppid(appid) {
+    return appid.replace(/_/g, '');
+}
+function createRegExp(appid) {
+    return new RegExp('uni\\.' + appid + '\\.(.*)\\..*\\(*\\.kt:([0-9]+)\\)');
+}
+let kotlinManifest = {
+    mtimeMs: 0,
+    manifest: {},
+};
+function updateUTSKotlinSourceMapManifestCache(cacheDir) {
+    const manifestFile = path_1.default.resolve(cacheDir, 'src/.manifest.json');
+    try {
+        const stats = fs_extra_1.default.statSync(manifestFile);
+        if (stats.isFile()) {
+            if (kotlinManifest.mtimeMs !== stats.mtimeMs) {
+                const { files } = fs_extra_1.default.readJSONSync(manifestFile);
+                if (files) {
+                    const classManifest = {};
+                    Object.keys(files).forEach((name) => {
+                        const kotlinClass = files[name].class;
+                        if (kotlinClass) {
+                            classManifest[kotlinClass] = name;
+                        }
+                    });
+                    kotlinManifest.mtimeMs = stats.mtimeMs;
+                    kotlinManifest.manifest = classManifest;
+                }
+            }
+        }
+    }
+    catch (e) { }
+}
+exports.updateUTSKotlinSourceMapManifestCache = updateUTSKotlinSourceMapManifestCache;
+function parseFilenameByClassName(className) {
+    return kotlinManifest.manifest[className.split('$')[0]] || 'index.kt';
+}
+exports.parseFilenameByClassName = parseFilenameByClassName;
+function resolveUTSKotlinFilenameByClassName(className, { cacheDir }) {
+    updateUTSKotlinSourceMapManifestCache(cacheDir);
+    return parseFilenameByClassName(className);
+}
+exports.resolveUTSKotlinFilenameByClassName = resolveUTSKotlinFilenameByClassName;
+function parseUTSKotlinRuntimeStacktrace(stacktrace, options) {
+    const appid = normalizeAppid(options.appid || DEFAULT_APPID);
+    if (!stacktrace.includes('uni.' + appid + '.')) {
+        return '';
+    }
+    updateUTSKotlinSourceMapManifestCache(options.cacheDir);
+    const re = createRegExp(appid);
+    const res = [];
+    const lines = stacktrace.split(utils_2.splitRE);
+    const sourceMapDir = (0, utils_2.resolveSourceMapDirByCacheDir)(options.cacheDir);
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const codes = parseUTSKotlinRuntimeStacktraceLine(line, re, sourceMapDir);
+        if (codes.length && res.length) {
+            const color = options.logType
+                ? utils_2.COLORS[options.logType] || ''
+                : '';
+            let error = 'error: ' +
+                formatKotlinError(resolveCausedBy(res), codes, runtimeFormatters);
+            if (color) {
+                error = color + error + color;
+            }
+            return (utils_1.SPECIAL_CHARS.ERROR_BLOCK +
+                [error, ...codes].join('\n') +
+                utils_1.SPECIAL_CHARS.ERROR_BLOCK);
+        }
+        else {
+            res.push(line);
+        }
+    }
+    return '';
+}
+exports.parseUTSKotlinRuntimeStacktrace = parseUTSKotlinRuntimeStacktrace;
+function resolveCausedBy(lines) {
+    // 从最后一行开始，找到第一个Caused by:
+    for (let i = lines.length - 1; i >= 0; i--) {
+        if (lines[i].startsWith('Caused by: ')) {
+            return lines[i].replace('Caused by: ', '');
+        }
+    }
+    return lines[0];
+}
+function parseUTSKotlinRuntimeStacktraceLine(lineStr, re, sourceMapDir) {
+    const lines = [];
+    const matches = lineStr.match(re);
+    if (!matches) {
+        return lines;
+    }
+    const [, className, line] = matches;
+    const sourceMapFile = (0, utils_2.resolveSourceMapFileBySourceFile)(parseFilenameByClassName(className), sourceMapDir);
+    if (!sourceMapFile) {
+        return lines;
+    }
+    const originalPosition = (0, sourceMap_1.originalPositionForSync)({
+        sourceMapFile,
+        line: parseInt(line),
+        column: 0,
+        withSourceContent: true,
+    });
+    if (originalPosition.source && originalPosition.sourceContent) {
+        lines.push(`at ${originalPosition.source.split('?')[0]}:${originalPosition.line}:${originalPosition.column}`);
+        if (originalPosition.line !== null && originalPosition.column !== null) {
+            const { start, end } = (0, utils_2.lineColumnToStartEnd)(originalPosition.sourceContent, originalPosition.line, originalPosition.column);
+            lines.push((0, utils_2.generateCodeFrame)(originalPosition.sourceContent, start, end).replace(/\t/g, ' '));
+        }
+    }
+    return lines;
+}
+const TYPE_MISMATCH_RE = /Type mismatch: inferred type is (.*) but (.*) was expected/;
+function normalizeType(type) {
+    type = type.replace(/\b(Unit)\b/g, 'Unit \x1b[90m/* = void */\x1b[39m');
+    if (type.endsWith('?')) {
+        let nonOptional = type.slice(0, -1);
+        if (nonOptional.startsWith('(') && nonOptional.endsWith(')')) {
+            nonOptional = nonOptional.slice(1, -1);
+        }
+        return `${type}（可为空的${nonOptional}）`;
+    }
+    return type;
+}
+const extApiErrorFormatter = {
+    format(error, codes) {
+        if (error.includes('Failed resolution of: L')) {
+            let isUniExtApi = error.includes('uts/sdk/modules/DCloudUni') ||
+                error.includes('io/dcloud/uniapp/extapi/');
+            let isUniCloudApi = !isUniExtApi && error.includes('io/dcloud/unicloud/UniCloud');
+            if (isUniExtApi || isUniCloudApi) {
+                let api = '';
+                // 第一步先遍历查找^^^^^的索引
+                const codeFrames = codes[codes.length - 1].split(utils_2.splitRE);
+                const index = codeFrames.findIndex((frame) => frame.includes('^^^^^'));
+                if (index > 0) {
+                    // 第二步，取前一条记录，查找uni.开头的api
+                    api = findApi(codeFrames[index - 1], isUniCloudApi ? UNI_CLOUD_API_RE : UNI_API_RE);
+                }
+                if (api) {
+                    api = `api ${api}`;
+                }
+                else {
+                    api = `您使用到的api`;
+                }
+                return `[EXCEPTION] 当前运行的基座未包含${api}，请重新打包自定义基座再运行。`;
+            }
+        }
+    },
+};
+function parseOrigType(type1, type2) {
+    if (type1.startsWith(type2)) {
+        const renamedIndex = type1.replace(type2, '');
+        if (/[0-9]+/.test(renamedIndex)) {
+            return type2;
+        }
+    }
+}
+const typeMismatchErrorFormatter = {
+    format(error, _) {
+        const matches = error.match(TYPE_MISMATCH_RE);
+        if (matches) {
+            const [, inferredType, expectedType] = matches;
+            const normalizedInferredType = normalizeType(inferredType);
+            const normalizedExpectedType = normalizeType(expectedType);
+            let extra = '';
+            const origType = parseOrigType(normalizedInferredType, normalizedExpectedType) ||
+                parseOrigType(normalizedExpectedType, normalizedInferredType);
+            if (origType) {
+                extra = `该错误可能是没有使用import导入${origType}引发的`;
+            }
+            return `类型不匹配: 推断类型是${normalizedInferredType}，但预期的是${normalizedExpectedType}${extra ? `，${extra}` : ''}。`;
+        }
+    },
+};
+// error: Unresolved reference: PreLoginOptions‌
+const UNRESOLVED_REFERENCE_RE = /Unresolved reference: (.*)/;
+const unresolvedApiMap = require('../../lib/kotlin/unresolved.json');
+const unresolvedErrorFormatter = {
+    format(error, _) {
+        const matches = error.match(UNRESOLVED_REFERENCE_RE);
+        if (matches) {
+            const name = matches[1].trim();
+            const api = unresolvedApiMap[name];
+            if (api) {
+                return `${error}。[详情](${api.url})`;
+            }
+        }
+        return error;
+    },
+};
+const compileFormatters = [
+    typeMismatchErrorFormatter,
+    unresolvedErrorFormatter,
+];
+const runtimeFormatters = [extApiErrorFormatter];
+const UNI_API_RE = /(uni\.\w+)/;
+const UNI_CLOUD_API_RE = /(uniCloud\.\w+)/;
+function findApi(msg, re) {
+    const matches = msg.match(re);
+    if (matches) {
+        return matches[1];
+    }
+    return '';
+}
+function formatKotlinError(error, codes, formatters) {
+    // 替换响应式类型为标准类型，使用对象映射提高可维护性
+    const typeReplacements = {
+        UTSReactiveJSONObject: 'UTSJSONObject',
+        UTSReactiveSet: 'Set',
+        UTSReactiveMap: 'Map',
+        UTSReactiveArray: 'Array',
+    };
+    Object.entries(typeReplacements).forEach(([reactiveType, standardType]) => {
+        error = error.replace(new RegExp(`\\b${reactiveType}\\b`, 'g'), standardType);
+    });
+    for (const formatter of formatters) {
+        const err = formatter.format(error, codes);
+        if (err) {
+            return err;
+        }
+    }
+    return error;
+}

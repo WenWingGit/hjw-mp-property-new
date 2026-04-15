@@ -1,0 +1,20 @@
+import { UniElement } from './UniElement'
+import { UniTextLayout } from './index'
+
+
+declare global {
+  /**
+   * UniTextElement
+   */
+  interface UniTextElement extends UniElement {
+
+    /**
+     * 设置文本内容
+     *  Android平台仅在kotlin层实现，用于开放给开发者使用
+     *  鸿蒙/iOS平台的在c层实现，设置后需同步更新给NativeView
+     *  鸿蒙/iOS平台在ArkTS/Swift包装调用c层的实现
+     */
+    setLayoutText(text: UniTextLayout): void;
+  }
+}
+

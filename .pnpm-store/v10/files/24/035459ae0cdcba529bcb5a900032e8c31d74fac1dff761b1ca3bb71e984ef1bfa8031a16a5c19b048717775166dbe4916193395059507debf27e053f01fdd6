@@ -1,0 +1,18 @@
+import { NumberToZhOptions } from 'number-to-zh';
+import { ZhToNumberOptions } from 'zh-to-number';
+import { NumberToZhCurrencyOptions } from 'number-to-zh-currency';
+import { ZhCurrencyToNumberOptions } from 'zh-currency-to-number';
+
+var version = "0.0.1";
+
+type NumberZhOptions = NumberToZhOptions | NumberToZhCurrencyOptions | ZhCurrencyToNumberOptions | ZhToNumberOptions;
+declare class NumberZh {
+    private comprehensiveOptions;
+    constructor(comprehensiveOptions?: NumberZhOptions);
+    numberToZh(num: number | string, personalizationOptions?: NumberToZhOptions): string | number;
+    numberToZhCurrency(num: number | string, personalizationOptions?: NumberToZhCurrencyOptions): string | number;
+    zhCurrencyToNumber(inputNumberString: string, personalizationOptions?: ZhCurrencyToNumberOptions): string | number;
+    zhToNumber(inputNumberString: string, personalizationOptions?: ZhToNumberOptions): string | number;
+}
+
+export { NumberZh, type NumberZhOptions, version };

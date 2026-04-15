@@ -1,0 +1,11 @@
+import { type GenerateAppHarmonyCodeFrameOptions } from './arkts';
+import { type GenerateAppIOSJavaScriptRuntimeCodeFrameOptions, type GenerateJavaScriptRuntimeCodeFrameOptions } from './js';
+import { type GenerateAppAndroidKotlinRuntimeCodeFrameOptions } from './kotlin';
+import { type GenerateMiniProgramRuntimeCodeFrameOptions } from './mp';
+export { parseUTSSwiftPluginStacktrace } from './swift';
+export { parseUTSArkTSPluginStacktrace } from './arkts';
+export { parseUTSKotlinStacktrace, parseUTSKotlinRuntimeStacktrace, resolveUTSKotlinFilenameByClassName, } from './kotlin';
+export { parseUTSJavaScriptRuntimeStacktrace } from './js';
+export declare function parseRuntimeStacktrace(stacktrace: string, options: GenerateAppAndroidKotlinRuntimeCodeFrameOptions | GenerateAppIOSJavaScriptRuntimeCodeFrameOptions | GenerateAppHarmonyCodeFrameOptions | GenerateMiniProgramRuntimeCodeFrameOptions): Promise<string | undefined>;
+export declare function parseUTSRuntimeStacktrace(stacktrace: string, options: GenerateAppAndroidKotlinRuntimeCodeFrameOptions | GenerateAppHarmonyCodeFrameOptions | GenerateJavaScriptRuntimeCodeFrameOptions): string | Promise<string> | undefined;
+export declare function parseUTSSyntaxError(error: any, inputDir: string): string;

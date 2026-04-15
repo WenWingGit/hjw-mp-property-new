@@ -1,0 +1,55 @@
+import { UniElement } from './index'
+import { UniElementType, UniElementStyles } from './UniElementType'
+import { UniViewElement } from './index'
+import { UniTextElement } from './index'
+import { UniImageElement } from './index'
+import { UniNativeView } from './UniNativeView'
+import { UniNativeTextView } from './UniNativeTextView'
+import { UniNativeImageView } from './UniNativeImageView'
+import { UniNativeScrollView, UniNativeScrollViewOptions } from './UniNativeScrollView'
+import { UniNativeCustomView } from './UniNativeCustomView'
+
+declare global {
+  /**
+   * 页面对象
+   */
+  interface UniPage {
+
+    /**
+     * 创建UniElement
+     * 仅内部使用
+     * @param type - UniElementType类型
+     * @param flatten - Element是否被拍平（扁平化）
+     *  true表示可拍平，false表示不可拍平，默认值false
+     * @param style - 同时设置多个CSS样式
+     * 注意：在Android平台仅支持排版CSS，为了各平台统一，编译生成的代码应该只设置排版相关CSS
+     */
+    createElement(type: UniElementType, flatten: boolean): UniElement
+    createElement(type: UniElementType, flatten: boolean, style: UniElementStyles): UniElement
+    createViewElement(flatten: boolean, style?: UniElementStyles | null): UniViewElement
+    createTextElement(flatten: boolean, style?: UniElementStyles | null): UniTextElement
+    createImageElement(flatten: boolean, style?: UniElementStyles | null): UniImageElement
+    createComment(data: string): UniElement
+
+    /**
+     * 创建原生View
+     * @param flatten 原生View是否被拍平（扁平化），true表示可拍平，false表示不可拍平，默认值false
+     */
+    createNativeView(flatten: boolean): UniNativeView
+    createNativeTextView(flatten: boolean): UniNativeTextView
+    createNativeImageView(flatten: boolean): UniNativeImageView
+    createNativeScrollView(options: UniNativeScrollViewOptions, flatten: boolean): UniNativeScrollView
+    createNativeCustomView(flatten: boolean): UniNativeCustomView
+    // 废弃通过类型创建NativeView的API，改用上面创建指定类型的原生View
+    // createNativeView(type: UniNativeViewType, flatten: boolean): UniNativeBaseView
+    // createNativeView<T extends UniNativeBaseView>(type: UniNativeViewType, flatten: boolean): T
+
+
+    /**
+     * 定义CSS变量
+     * @param key - css变量名称
+     * @param value - css变量值，空字符串则表示移除变量定义
+     */
+    defineStyleVariable(key: string, value: string): void
+  }
+}

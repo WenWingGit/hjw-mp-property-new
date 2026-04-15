@@ -11,7 +11,9 @@ interface NavigateToOptions {
        "/pages/login/login" |
        "/pages/login/register" |
        "/pages/login/wxLogin" |
-       "/pages/recharge/recharge";
+       "/pages/paymentRecord/paymentRecord" |
+       "/pages/recharge/recharge" |
+       "/pages/rechargeRecord/rechargeRecord";
 }
 interface RedirectToOptions extends NavigateToOptions {}
 

@@ -1,0 +1,386 @@
+import { UniNativeColor } from "./UniNativeDefines"
+import { UniCSSUnitValue } from "./UniCSSType"
+
+
+declare global {
+  /**
+   * 布局大小
+   */
+  interface UniLayoutSize {
+    /**
+     * 元素宽度，逻辑像素值。
+     */
+    width: number,
+    /**
+     * 元素的高度，逻辑像素值。
+     */
+    height: number
+  }
+}
+
+/**
+ * 布局约束大小
+ */
+interface UniLayoutConstraintSize {
+  /**
+   * 元素最小宽度，逻辑像素值。
+   * 可选值，不设置则认为没有最小宽度。
+   */
+  minWidth: number | null,
+  /**
+   * 元素最大宽度，逻辑像素值。
+   * 可选值，不设置则认为可以无限宽。
+   */
+  maxWidth: number | null,
+  /**
+   * 元素最小高度，逻辑像素值。
+   * 可选值，不设置则认为没有最小高度。
+   */
+  minHeight: number | null,
+  /**
+   * 元素最大高度，逻辑像素值。
+   * 可选值，不设置则认为可以无限高。
+   */
+  maxHeight: number | null,
+}
+
+
+/**
+ * 文字长度值类型
+ * 使用CSS中带单位的值类型
+ */
+export type UniTextLength = UniCSSUnitValue;
+
+/**
+ * 文本装饰线样式类型
+ */
+export enum UniTextDecorationStyleType {
+  /**
+   * 实线
+   */
+  Solid,
+  /**
+   * 双实线
+   */
+  Double,
+  /**
+   * 点划线
+   */
+  Dotted,
+  /**
+   * 虚线
+   */
+  Dashed,
+  /**
+   * 波浪线
+   */
+  Wavy,
+}
+
+/**
+ * 文本装饰线类型
+ */
+export enum UniTextDecorationLineType {
+  /**
+   * 没有文本装饰线
+   */
+  None,
+  /**
+   * 文本的下方有装饰线
+   */
+  Underline,
+  /**
+   * 文本的上方有装饰线
+   */
+  Overline,
+  /**
+   * 贯穿文本中间的装饰线
+   */
+  LineThrough,
+}
+
+/**
+ * 文本装饰性线厚度
+ */
+export type UniTextDecorationThickness = UniTextDecorationThicknessType | UniCSSUnitValue;
+/**
+ * 文本装饰性线笔触厚度样式
+ */
+export enum UniTextDecorationThicknessType {
+  /**
+   * 自动选择合适的厚度
+   */
+  Auto,
+  /**
+   * 优先使用字体文件中包含了首选的厚度值，否则与Auto值一样
+   */
+  FromFont,
+}
+
+/**
+ * 文本装饰性线样式
+ */
+export interface UniTextDecorationStyle {
+  /**
+   * 装饰线线条类型
+   */
+  line: UniTextDecorationLineType,
+  /**
+   * 装饰线颜色
+   * 默认值与文本颜色值一致
+   */
+  color: UniNativeColor,
+  /**
+   * 装饰线样式
+   * 默认值为实线
+   */
+  style: UniTextDecorationStyleType,
+  /**
+   * 装饰性线厚度
+   * 默认值为Auto
+   */
+  thickness: UniTextDecorationThickness
+}
+
+/**
+ * 字体样式
+ */
+export enum UniFontStyle {
+  /**
+   * 常规字体
+   */
+  Normal,
+  /**
+   * 斜体字体
+   */
+  Italic,
+}
+
+/**
+ * 字体粗细类型
+ */
+export enum UniFontWeight {
+  /**
+   * 正常粗细
+   * 与400等值
+   */
+  Normal,
+  /**
+   * 加粗
+   * 与700等值
+   */
+  Bold,
+  /**
+   * 比正常值更细
+   */
+  Lighter,
+  /**
+   * 比正常值更粗
+   */
+  Bolder,
+}
+
+/**
+ * 文本行高
+ */
+export type UniTextLineHeight = UniTextLineHeightType | UniTextLength;
+export enum UniTextLineHeightType {
+  /**
+   * 默认行高
+   * 约为1.2em
+   */
+  Normal,
+}
+
+/**
+ * 文本对齐方式
+ */
+export enum UniTextAlign {
+  /**
+   * 行内内容向左侧边对齐
+   */
+  Left,
+  /**
+   * 行内内容向右侧边对齐
+   */
+  Right,
+  /**
+   * 行内内容居中
+   */
+  Center,
+}
+
+/**
+ * 文字溢出处理样式
+ */
+export enum UniTextOverflow {
+  /**
+   * 截断溢出内容
+   */
+  Clip,
+  /**
+   * 溢出内容显示为省略号
+   */
+  Ellipsis,
+}
+
+/**
+ * 文字阴影样式
+ */
+export type UniTextShadow = {
+  /**
+   * 阴影颜色
+   * 默认为文字颜色
+   */
+  color: UniNativeColor
+  /**
+   * 阴影的 x 偏移量
+   */
+  offsetX: number
+  /**
+   * 阴影的 y 偏移量
+   */
+  offsetY: number
+  /**
+   * 阴影的模糊半径
+   * 默认值为0
+   */
+  blurRadius: number
+}
+
+/**
+ * 文字空白字符串处理类型
+ */
+export enum UniWhiteSpace {
+  /**
+   * 连续的空白符会被合并，支持换行符
+   */
+  Normal,
+  /**
+   * 连续的空白符会被合并，不换行
+   */
+  Nowrap,
+  /**
+   * 连续的空白符会保留，换行
+   */
+  Pre,
+  /**
+   * 连续的空白符会保留，换行，根据内容会自动换
+   */
+  PreWrap,
+}
+
+declare global {
+
+  /**
+   * 文本输出对象
+   * 需支持跨线程共享
+   */
+  interface UniTextLayout {
+    /**
+     * 设置文本
+     */
+    setText(text: string): void
+
+    /**
+     * 设置文本颜色
+     * @param color
+     *  UniNativeColor - 平台颜色类型
+     *  string - 兼容字符串参数设置文本颜色
+     */
+    setColor(color: UniNativeColor | string): void
+
+    /**
+     * 设置字体名称
+     */
+    setFontFamily(family: string): void
+
+    /**
+     * 设置字体大小
+     * @param size
+     *  UniTextLength - 带单位的文字大小
+     *  string - 兼容字符串参数设置字体大小
+     */
+    setFontSize(size: UniTextLength | string): void
+
+    /**
+     * 设置字体样式
+     * @param style
+     *  UniFontStyle - 枚举类型字体样式
+     *  string - 兼容字符串参数设置字体样式
+     */
+    setFontStyle(style: UniFontStyle | string): void
+
+    /**
+     * 设置字体粗细
+     * 默认值为Normal
+     * @param weight
+     *  UniFontWeight - 字体粗细枚举值
+     *  number - 体粗细具体值
+     *  string - 兼容字符串参数设置字体粗细
+     */
+    setFontWeight(weight: UniFontWeight | number | string): void
+
+    /**
+     * 设置文本行高
+     * 默认值为Normal
+     * @param height
+     *  UniTextLineHeight - 文本行高值
+     *  string - 兼容字符串参数设置文本行高
+     */
+    setLineHeight(height: UniTextLineHeight | string): void
+
+    /**
+     * 设置文字水平对齐方式
+     * 默认值为Left
+     * @param align
+     *  UniTextAlign - 文字水平对齐枚举值
+     *  string - 兼容字符串参数设置文字水平对齐方式
+     */
+    setTextAlign(align: UniTextAlign | string): void
+
+    /**
+     * 设置文字溢出处理样式
+     * @param overflow
+     *  UniTextOverflow - 文字溢出处理样式枚举值
+     *  string - 兼容字符串参数设置文字溢出处理样式
+     */
+    setTextOverflow(overflow: UniTextOverflow | string): void
+
+    /**
+     * 设置文字阴影
+     * @param shadow
+     *  UniTextShadow - 文字阴影类型值
+     *  string - 兼容字符串参数设置文字阴影
+     */
+    setTextShadow(shadow: UniTextShadow | string): void
+
+    /**
+     * 设置处理空白字符
+     */
+    setWhiteSpace(whiteSpace: UniWhiteSpace | string): void
+
+    /**
+     * 设置文本装饰线样式
+     */
+    setTextDecoration(style: UniTextDecorationStyle): void
+    /**
+     * 设置文本装饰线线条类型
+     * 其它效果不支持时使用此API设置
+     */
+    setTextDecorationLine(type: UniTextDecorationLineType): void
+
+    /**
+     * 添加子文本对象
+     * 支持text的嵌套
+     */
+    append(text: UniTextLayout): void
+
+    /**
+     * 测量文本大小
+     * 调用此方法会创建原生测量对象
+     */
+    measure(constraint: UniLayoutConstraintSize): UniLayoutSize;
+  }
+}
+
