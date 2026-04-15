@@ -72,7 +72,7 @@ const menuList = [
     desc: 'appointment',
     icon: c1,
     bgVal: '#F2EEFF',
-    path: '/pages/',
+    path: '/pages/recharge/recharge',
   },
 ]
 

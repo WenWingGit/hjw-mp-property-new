@@ -9,3 +9,5 @@ const sharePages = [
   '/pages/index/storeList/storeList',
   '/pages/index/eventPromotion/detail',
 ]
+
+export const SCAN_PAY_URL = 'https://example.com/scan-pay'

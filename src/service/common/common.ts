@@ -192,3 +192,36 @@ export const getLastAppVersionApi = () => {
     },
   )
 }
+
+/**
+ * 获取物业缴费金额列表
+ * @returns
+ */
+export const getPropertyAmountListApi = () => {
+  return http.get<any[]>('/WxMinApi/RechargeAmount/GetPropertyAmountList')
+}
+
+/**
+ * 获取物业钱包余额
+ * @returns
+ */
+export const getHouseWalletBalanceApi = () => {
+  return http.get<any>('/WxMinApi/House/GetHouseWalletBalance')
+}
+
+/**
+ * 提交物业充值申请
+ * @param params
+ * @returns
+ */
+export const submitPropertyRechargeApi = (params: any) => {
+  return http.post<any>('/WxMinApi/RechargeApply/SubmitPropertyRecharge', params)
+}
+
+/**
+ * 获取二维码
+ * @returns
+ */
+export const getQrCodeApi = () => {
+  return http.get<any>('/WxMinApi/WebUser/GetQrCode')
+}
