@@ -12,30 +12,30 @@ export interface ILoginByWxPhoneCodeReq {
 
 // 登录请求
 export interface ILoginAccountReq {
-  phone?: string
-  verificationCode: string
-  wxCode?: string
-  salesUserId?: number
+  username: string
+  password: string
+  clientId: string
+  grantType: string
+  iv: string
+  requestId: string
 }
 
 /** 登录响应 */
 export interface ILoginRes {
   accessToken: string
-  refreshToken: string
-  /** AccessToken的失效日期，用于前端判断是否需要传刷新token */
-  expireTime: string
-  /** 刷新令牌过期天数 */
-  refreshExpireDay: number
-  /** AccessToken的失效分钟数 */
-  expireTimeMinute: number
-  /** 门店Id */
-  createdStoreId: IdNumber
-  /** 实际所属门店Id */
-  affiliatedStoreId: IdNumber
-  /** 用户Id */
-  userId: IdNumber
-  /** 账号类型 */
-  accountType: AccountTypeEnum
+  // refreshToken: string
+  expireIn: number
+  userInfo: IUserInfo
+}
+
+/** 用户信息响应 */
+export interface IUserInfo {
+  email: string
+  id: number
+  logo: string
+  nickname: string
+  phone: string
+  username: string
 }
 
 /** 修改密码请求 */

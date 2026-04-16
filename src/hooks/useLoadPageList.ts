@@ -4,12 +4,7 @@ import { $tips } from '@/utils/common'
 export default function (
   apiFn,
   defaultQuery,
-  { 
-    isAutoLoad = true, 
-    isShowLoading = false,
-    request0Remove = [],
-    loadedCallBack = () => {}, 
-  } = {},
+  { isAutoLoad = true, isShowLoading = false, request0Remove = [], loadedCallBack = () => {} } = {},
 ) {
   const isRefreshLoading = ref(false)
 

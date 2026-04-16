@@ -21,7 +21,7 @@ export const loginByWxCodeApi = (params: ILoginByWxCodeReq) => {
 
 // 登录
 export const doStoreLoginApi = (params: ILoginAccountReq) => {
-  return http.post<ILoginRes>('/WxMinApi/Auth/LoginByPhoneAndVerificationCode', params)
+  return http.post<ILoginRes>('/api/admin/auth/login', params)
 }
 
 // 获取用户信息

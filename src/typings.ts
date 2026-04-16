@@ -2,7 +2,7 @@
 
 // 请求返回数据类型
 export type IResData<T> = {
-  code: number
+  code: number | string
   message: string
   data: T
   success: boolean

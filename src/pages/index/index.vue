@@ -8,6 +8,7 @@
   },
 }
 </route>
+
 <template>
   <view class="index-page">
     <NavTopBar bg-color="#fff" title-color="#1a1a1a" btn-theme="black" title="汇景湾物业缴费" />
@@ -58,6 +59,7 @@ import c6 from '@/static/images/c6.svg'
 import b1 from '@/static/images/b1.png'
 import GroupTitle from '@/components/swim/GroupTitle.vue'
 import { handleSalesUserIdOnLoad } from '@/utils'
+import { getLoginInfo } from '@/utils/login'
 
 const menuList = [
   {
@@ -69,7 +71,7 @@ const menuList = [
   },
   {
     title: '充值',
-    desc: 'appointment',
+    desc: 'recharge',
     icon: c1,
     bgVal: '#F2EEFF',
     path: '/pages/recharge/recharge',
@@ -77,19 +79,19 @@ const menuList = [
 ]
 
 const handleNav = (path: string) => {
+  const loginInfo = getLoginInfo()
+  if (!loginInfo) {
+    uni.navigateTo({
+      url: '/pages/login/login',
+    })
+    return
+  }
   uni.navigateTo({
     url: `${path}`,
   })
 }
 
-const isLoaded = ref(false)
-onLoad(async (options) => {
-  await handleSalesUserIdOnLoad(options)
-  // 自动登录逻辑已统一在HTTP拦截器中处理，无需在每个页面重复
-  // 直接加载数据，如果接口支持未登录访问，会正常返回
-  // 如果接口需要登录，会收到401，由HTTP拦截器处理
-  isLoaded.value = true
-})
+onLoad(async (options) => {})
 </script>
 
 <style lang="scss" scoped>

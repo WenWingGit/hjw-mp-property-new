@@ -63,8 +63,8 @@
         <view class="bill-card" v-for="(item, index) in list" :key="item.id">
           <view class="card-header">
             <view class="card-title">
-              <text>{{ item.month }}物业费待缴金额：</text>
-              <text class="title-price">¥{{ item.totalAmount }}</text>
+              <text>{{ item.itemName }}：</text>
+              <text class="title-price">¥{{ item.billAmount }}</text>
             </view>
             <wd-checkbox
               v-if="item.showCheckBox"
@@ -76,23 +76,25 @@
           </view>
 
           <view class="card-info">
-            <view class="info-line">缴费小区：{{ item.community }} | {{ item.room }}</view>
-            <view class="info-line">账单时间：{{ item.billTime }}</view>
+            <view class="info-line">
+              缴费小区：{{ item.communityName }} | {{ item.propertyNo }}
+            </view>
+            <view class="info-line">账单时间：{{ item.createTime }}</view>
             <view class="info-line">
               账单状态：
-              <text class="status-text">{{ item.statusText }}</text>
+              <text class="status-text">{{ BillPayStatusValueEnum[item.status] }}</text>
             </view>
           </view>
 
-          <view class="fee-detail-box">
-            <view class="fee-row" v-for="(detail, dIndex) in item.details" :key="dIndex">
-              <text class="fee-label">{{ detail.name }}：</text>
-              <text class="fee-value">¥{{ detail.value }}</text>
+          <view v-if="item.lateFeeAmount" class="fee-detail-box">
+            <view class="fee-row">
+              <text class="fee-label">滞纳金金额：</text>
+              <text class="fee-value">¥{{ item.lateFeeAmount }}</text>
             </view>
           </view>
 
           <!-- 已缴费才显示 -->
-          <view class="fee-footer" v-if="item.status === 2">
+          <view class="fee-footer">
             <wd-button size="small" type="primary" @click="onCreateCertificate(item)">
               生成电子凭证
             </wd-button>
@@ -110,7 +112,9 @@
           <text class="total-price">¥{{ selectedTotalPrice }}</text>
         </view>
         <!-- 有余额这种东西吗？ 没有的话删掉即可 -->
-        <view class="wallet-balance">钱包余额：¥10.00</view>
+        <view v-if="myWalletInfo" class="wallet-balance">
+          钱包余额：¥{{ myWalletInfo.balance }}
+        </view>
       </view>
       <view class="right-section">
         <button class="pay-btn" :class="{ disabled: selectedTotalPrice <= 0 }" @click="handlePay">
@@ -183,6 +187,10 @@ import BuyBar from '@/components/swim/BuyBar.vue'
 // 默认选中今年1月1日到今天
 import dayjs from 'dayjs'
 import { useMessage } from 'wot-design-uni'
+import { getBillListApi, myWalletApi } from '@/service/bill'
+import { useLoginStore } from '@/store'
+import { storeToRefs } from 'pinia'
+import { BillPayStatusEnum, BillPayStatusValueEnum } from '@/enum/billPayStatusEnum'
 
 const message = useMessage()
 
@@ -199,8 +207,8 @@ const defaultDateRange = ref(defaultDateRangeValue)
 // 状态选择器数据
 const statusOptions = ref([
   { label: '全部状态', value: 0 },
-  { label: '待缴费', value: 1 },
-  { label: '已缴费', value: 2 },
+  { label: '待缴费', value: BillPayStatusEnum.Pending },
+  { label: '已缴费', value: BillPayStatusEnum.Paid },
 ])
 
 // 滚动内容以外的高度
@@ -209,123 +217,8 @@ const { allRect: outScrollHeight } = useDomRect(
   'height',
 )
 
-// 创建模拟API函数
-const getBillList = (params: any) => {
-  const allMockData = [
-    {
-      id: 1,
-      month: '2024年7月',
-      totalAmount: '210.39',
-      community: '圭峰小区',
-      room: '5幢402',
-      billTime: '2024/08/05 24:00',
-      statusText: '待缴费',
-      status: 1,
-      billDate: '2024-08-05',
-      checked: false,
-      details: [
-        { name: '物业费（24年7月管理费）', value: '196.03' },
-        { name: '水电费分摊（24年6月分摊费）', value: '14.36' },
-        { name: '电梯费用', value: '0' },
-      ],
-    },
-    {
-      id: 2,
-      month: '2024年6月',
-      totalAmount: '210.39',
-      community: '圭峰小区',
-      room: '5幢402',
-      billTime: '2024/07/05 24:00',
-      statusText: '待缴费',
-      status: 1,
-      billDate: '2024-07-05',
-      checked: false,
-      details: [
-        { name: '物业费（24年6月管理费）', value: '196.03' },
-        { name: '水电费分摊（24年5月分摊费）', value: '14.36' },
-        { name: '电梯费用', value: '0' },
-        { name: '违约金', value: '10' },
-      ],
-    },
-    {
-      id: 3,
-      month: '2024年5月',
-      totalAmount: '196.03',
-      community: '圭峰小区',
-      room: '5幢402',
-      billTime: '2024/06/05 24:00',
-      statusText: '已缴费',
-      status: 2,
-      billDate: '2024-06-05',
-      checked: false,
-      details: [
-        { name: '物业费（24年5月管理费）', value: '196.03' },
-        { name: '水电费分摊（24年4月分摊费）', value: '0' },
-        { name: '电梯费用', value: '0' },
-      ],
-    },
-    {
-      id: 4,
-      month: '2024年4月',
-      totalAmount: '210.39',
-      community: '圭峰小区',
-      room: '5幢402',
-      billTime: '2024/05/05 24:00',
-      statusText: '已缴费',
-      status: 2,
-      billDate: '2024-05-05',
-      checked: false,
-      details: [
-        { name: '物业费（24年4月管理费）', value: '196.03' },
-        { name: '水电费分摊（24年3月分摊费）', value: '14.36' },
-        { name: '电梯费用', value: '0' },
-      ],
-    },
-    {
-      id: 5,
-      month: '2024年3月',
-      totalAmount: '196.03',
-      community: '圭峰小区',
-      room: '5幢402',
-      billTime: '2024/04/05 24:00',
-      statusText: '已缴费',
-      status: 2,
-      billDate: '2024-04-05',
-      checked: false,
-      details: [
-        { name: '物业费（24年3月管理费）', value: '196.03' },
-        { name: '水电费分摊（24年2月分摊费）', value: '0' },
-        { name: '电梯费用', value: '0' },
-      ],
-    },
-  ]
-
-  let filteredData = [...allMockData]
-
-  if (params.status && params.status !== 0) {
-    filteredData = filteredData.filter((item) => item.status === params.status)
-  }
-
-  if (params.startDate && params.endDate) {
-    const startDate = new Date(params.startDate.replace(/\//g, '-'))
-    const endDate = new Date(params.endDate.replace(/\//g, '-'))
-    filteredData = filteredData.filter((item) => {
-      const billDate = new Date(item.billDate)
-      return billDate >= startDate && billDate <= endDate
-    })
-  }
-
-  return Promise.resolve({
-    code: '0000',
-    data: {
-      rows: filteredData,
-      total: filteredData.length,
-      current: params.page,
-      limit: params.limit,
-      totalPage: 1,
-    },
-  })
-}
+const loginStore = useLoginStore()
+const { loginInfo, userId } = storeToRefs(loginStore)
 
 // 使用useLoadPageList钩子
 const {
@@ -339,31 +232,37 @@ const {
   onLoadMore,
   isRefreshLoading,
 } = useLoadPageList(
-  getBillList,
+  getBillListApi,
   {
     page: 1,
     limit: 10,
-    // TODO: 这里修改需要上传的字段名称
     // 状态
-    status: 1,
+    status: 0,
     // 开始日期
-    startDate: '',
+    // effectiveTimeStart: '',
     //  || defaultDateRange.value[0],
     // 结束日期
-    endDate: '',
+    // effectiveTimeEnd: '',
     // || defaultDateRange.value[1],
+    ownerId: userId.value,
   },
   {
     isAutoLoad: true,
     loadedCallBack: (resList) => {
-      return (resList || []).map((item: any) => ({
-        ...item,
-        showCheckBox: item.status === 1,
-        checked: false,
-      }))
+      return (resList || []).map((item: any) => {
+        return {
+          ...item,
+          showCheckBox: item.status == BillPayStatusEnum.Pending,
+          checked: false,
+        }
+      })
     },
   },
 )
+
+onLoad(() => {
+  onLoadMyWallet()
+})
 
 // 格式化日期
 const formatDate = (date: Date): string => {
@@ -380,8 +279,8 @@ const onDateConfirm = (value: any) => {
     const startStr = formatDate(new Date(startDate))
     const endStr = formatDate(new Date(endDate))
     dateRangeText.value = `${startStr}-${endStr}`
-    pageQuery.startDate = startStr
-    pageQuery.endDate = endStr
+    pageQuery.effectiveTimeStart = startStr
+    pageQuery.effectiveTimeEnd = endStr
     onInitList()
   }
 }
@@ -389,8 +288,8 @@ const onDateConfirm = (value: any) => {
 const onDateReset = () => {
   defaultDateRange.value = defaultDateRangeValue
   dateRangeText.value = '全部日期'
-  pageQuery.startDate = ''
-  pageQuery.endDate = ''
+  pageQuery.effectiveTimeStart = ''
+  pageQuery.effectiveTimeEnd = ''
   onInitList()
 }
 
@@ -467,6 +366,20 @@ const confirmPay = () => {
 
 const onCreateCertificate = () => {
   message.alert('生成成功').then(() => {})
+}
+
+const myWalletInfo = ref()
+const onLoadMyWallet = async () => {
+  const res = await myWalletApi({
+    userId,
+  })
+  console.log({ res })
+  if (res?.data?.rows?.length) {
+    const myWallet = res?.data?.rows.find((item) => item.userId === userId.value)
+    if (myWallet) {
+      myWalletInfo.value = myWallet
+    }
+  }
 }
 </script>
 

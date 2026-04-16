@@ -5,6 +5,7 @@ import {
   type ILoginAccountReq,
   ILoginByWxPhoneCodeReq,
   ILoginRes,
+  IUserInfo,
 } from '@/service/typings/user'
 import { doStoreLoginApi, getUserInfoApi, loginByWxPhoneCodeApi } from '@/service/user'
 import { AccessTokenCacheKey, LoginCacheKey, RefreshTokenCacheKey } from './storeName'
@@ -34,6 +35,8 @@ export const useLoginStore = defineStore(
     // token
     const token = computed(() => loginInfo.value?.accessToken)
 
+    const userId = computed(() => loginInfo.value?.userInfo?.id)
+
     /** 设置用户登录信息 */
     const setLoginInfo = (val: ILoginRes) => {
       loginInfo.value = val
@@ -54,11 +57,11 @@ export const useLoginStore = defineStore(
     const doLogin = async (params: ILoginAccountReq) => {
       const res = await doStoreLoginApi(params)
       const accessToken = res?.data?.accessToken
-      const refreshToken = res?.data?.refreshToken
-      if (res?.success && res?.data) {
+      // const refreshToken = res?.data?.refreshToken
+      if (res?.data) {
         setLoginInfo(res.data)
         setCache(AccessTokenCacheKey, accessToken)
-        setCache(RefreshTokenCacheKey, refreshToken)
+        // setCache(RefreshTokenCacheKey, refreshToken)
         return Promise.resolve(res)
       }
       return Promise.reject(res)
@@ -68,23 +71,14 @@ export const useLoginStore = defineStore(
     const doLoginByWxPhoneCode = async (params: ILoginByWxPhoneCodeReq) => {
       const res = await loginByWxPhoneCodeApi(params)
       const accessToken = res?.data?.accessToken
-      const refreshToken = res?.data?.refreshToken
+      // const refreshToken = res?.data?.refreshToken
       if (res?.success && res?.data) {
         setLoginInfo(res.data)
         setCache(AccessTokenCacheKey, accessToken)
-        setCache(RefreshTokenCacheKey, refreshToken)
+        // setCache(RefreshTokenCacheKey, refreshToken)
         return Promise.resolve(res)
       }
       return Promise.reject(res)
-    }
-
-    // 模拟登录请使用此方法
-    const mockLogin = async (params: ILoginAccountReq) => {
-      setLoginInfo({
-        accessToken: 'accessToken123',
-        refreshToken: 'refreshToken123',
-      } as ILoginRes)
-      return Promise.resolve({})
     }
 
     const getUserInfo = async () => {
@@ -100,13 +94,13 @@ export const useLoginStore = defineStore(
       userInfo,
       token,
       isLogined,
+      userId,
       setLoginInfo,
       getUserInfo,
       setUserInfo,
       clearUserInfo,
       doLogin,
       doLoginByWxPhoneCode,
-      mockLogin,
     }
   },
   {

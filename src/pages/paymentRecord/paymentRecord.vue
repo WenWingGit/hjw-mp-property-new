@@ -22,7 +22,6 @@
       @scrolltolower="handleScrollToBottom"
     >
       <view class="page-container pb-40">
-
         <view
           class="box-white p-30 item-30"
           v-for="item in paymentRecordList"
@@ -53,13 +52,14 @@
           </view>
         </view>
 
-        <ListMore :params="{
-          isLoading: isLoading,
-          isNoMore: !pageInfo?.hasNextPage,
-          isEmpty: paymentRecordList.length === 0
-        }" />
+        <ListMore
+          :params="{
+            isLoading: isLoading,
+            isNoMore: !pageInfo?.hasNextPage,
+            isEmpty: paymentRecordList.length === 0,
+          }"
+        />
       </view>
-
     </scroll-view>
   </view>
 </template>
@@ -79,7 +79,7 @@ const navHeight = ref(0)
 
 const params = ref({
   pageIndex: 1,
-  pageSize: 10
+  pageSize: 10,
 })
 
 // 获取导航栏高度
@@ -112,18 +112,20 @@ const getPaymentRecordList = async (appointPage = 0) => {
     if (appointPage > 0) {
       // 只更新对应页的数据
       let oldItems = paymentRecordList.value || []
-      oldItems = oldItems.filter(v => {
-        if (v.page_index === arg.pageIndex) {
-          return list.find((t) => t.id === v.id)
-        }
-        return true
-      }).map((v) => {
-        const matchItem = list.find((t) => t.id === v.id)
-        if (matchItem) {
-          v = matchItem
-        }
-        return v
-      })
+      oldItems = oldItems
+        .filter((v) => {
+          if (v.page_index === arg.pageIndex) {
+            return list.find((t) => t.id === v.id)
+          }
+          return true
+        })
+        .map((v) => {
+          const matchItem = list.find((t) => t.id === v.id)
+          if (matchItem) {
+            v = matchItem
+          }
+          return v
+        })
       paymentRecordList.value = oldItems
     } else {
       pageInfo.value = res
@@ -133,7 +135,7 @@ const getPaymentRecordList = async (appointPage = 0) => {
   if (isRefreshing.value) {
     uni.showToast({
       title: '刷新成功',
-      icon: 'success'
+      icon: 'success',
     })
     isRefreshing.value = false
   }
@@ -170,9 +172,9 @@ onMounted(() => {
 }
 
 .record-title {
+  flex: 1;
   font-size: 32rpx;
   font-weight: bold;
-  flex: 1;
 }
 
 .Infobox {
@@ -180,23 +182,20 @@ onMounted(() => {
 }
 
 .record-text {
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 20rpx;
   font-size: 28rpx;
-  display: flex;
   color: #999;
-  justify-content: space-between;
 }
-
 /** 待支付 */
 .status-10 {
   color: var(--warning-color);
 }
-
 /** 支付成功 */
 .status-20 {
   color: var(--success-color);
 }
-
 /** 支付失败 */
 .status-30 {
   color: var(--danger-color);

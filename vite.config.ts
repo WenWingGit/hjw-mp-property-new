@@ -158,7 +158,20 @@ export default ({ command, mode }) => {
             [VITE_APP_PROXY_PREFIX]: {
               target: VITE_SERVER_BASEURL,
               changeOrigin: true,
-              rewrite: (path) => path.replace(new RegExp(`^${VITE_APP_PROXY_PREFIX}`), '/WxMinApi'),
+              rewrite: (path) => path.replace(new RegExp(`^${VITE_APP_PROXY_PREFIX}`), '/api'),
+              // 2. 添加 configure 钩子监听实际转发
+              configure: (proxy, options) => {
+                proxy.on('proxyReq', (proxyReq, req, res) => {
+                  // 在终端打印实际转发的完整目标路径
+                  console.log(
+                    `[Vite Proxy] Sending Request: [${req.method}] ${req.url} -> ${VITE_SERVER_BASEURL}${proxyReq.path}`,
+                  )
+                })
+
+                proxy.on('error', (err, req, res) => {
+                  console.error('[Vite Proxy] Error:', err)
+                })
+              },
             },
           }
         : undefined,

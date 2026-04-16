@@ -114,7 +114,7 @@ export const http = <T>(options: CustomRequestOptions) => {
         // 2.1 提取核心数据 res.data
         const data = res.data as IResData<T>
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          if (data?.code === 200) {
+          if (data?.code === '0000') {
             resolve(data)
           } else if (data?.code === 401) {
             // 清除登录信息
@@ -124,29 +124,29 @@ export const http = <T>(options: CustomRequestOptions) => {
             })
 
             // 判断平台，微信小程序自动登录重试，其他平台跳转登录页
-            if (PLATFORM.isWxMiniProgram && !isLoginApi(options.url)) {
-              // 检查是否已重试过，防止无限重试
-              const retryCount = options._retryCount || 0
-              if (retryCount < 1) {
-                // 自动登录并重试
-                onWxLogin()
-                  .then((loginResult) => {
-                    if (loginResult) {
-                      // 登录成功，重试请求
-                      retryRequest<T>(options).then(resolve).catch(reject)
-                    } else {
-                      // 登录失败（可能是新用户），静默处理，不强制跳转登录页
-                      // 让用户继续体验，需要登录时再提示
-                      reject(res)
-                    }
-                  })
-                  .catch(() => {
-                    // 登录异常，静默处理
-                    reject(res)
-                  })
-                return
-              }
-            }
+            // if (PLATFORM.isWxMiniProgram && !isLoginApi(options.url)) {
+            //   // 检查是否已重试过，防止无限重试
+            //   const retryCount = options._retryCount || 0
+            //   if (retryCount < 1) {
+            //     // 自动登录并重试
+            //     onWxLogin()
+            //       .then((loginResult) => {
+            //         if (loginResult) {
+            //           // 登录成功，重试请求
+            //           retryRequest<T>(options).then(resolve).catch(reject)
+            //         } else {
+            //           // 登录失败（可能是新用户），静默处理，不强制跳转登录页
+            //           // 让用户继续体验，需要登录时再提示
+            //           reject(res)
+            //         }
+            //       })
+            //       .catch(() => {
+            //         // 登录异常，静默处理
+            //         reject(res)
+            //       })
+            //     return
+            //   }
+            // }
 
             // 其他平台或已重试过，静默处理（不强制跳转登录页，让用户继续体验）
             reject(res)
@@ -164,29 +164,29 @@ export const http = <T>(options: CustomRequestOptions) => {
           })
 
           // 判断平台，微信小程序自动登录重试，其他平台跳转登录页
-          if (PLATFORM.isWxMiniProgram && !isLoginApi(options.url)) {
-            // 检查是否已重试过，防止无限重试
-            const retryCount = options._retryCount || 0
-            if (retryCount < 1) {
-              // 自动登录并重试
-              onWxLogin()
-                .then((loginResult) => {
-                  if (loginResult) {
-                    // 登录成功，重试请求
-                    retryRequest<T>(options).then(resolve).catch(reject)
-                  } else {
-                    // 登录失败（可能是新用户），静默处理，不强制跳转登录页
-                    // 让用户继续体验，需要登录时再提示
-                    reject(res)
-                  }
-                })
-                .catch(() => {
-                  // 登录异常，静默处理
-                  reject(res)
-                })
-              return
-            }
-          }
+          // if (PLATFORM.isWxMiniProgram && !isLoginApi(options.url)) {
+          //   // 检查是否已重试过，防止无限重试
+          //   const retryCount = options._retryCount || 0
+          //   if (retryCount < 1) {
+          //     // 自动登录并重试
+          //     onWxLogin()
+          //       .then((loginResult) => {
+          //         if (loginResult) {
+          //           // 登录成功，重试请求
+          //           retryRequest<T>(options).then(resolve).catch(reject)
+          //         } else {
+          //           // 登录失败（可能是新用户），静默处理，不强制跳转登录页
+          //           // 让用户继续体验，需要登录时再提示
+          //           reject(res)
+          //         }
+          //       })
+          //       .catch(() => {
+          //         // 登录异常，静默处理
+          //         reject(res)
+          //       })
+          //     return
+          //   }
+          // }
 
           // 其他平台或已重试过，静默处理（不强制跳转登录页，让用户继续体验）
           reject(res)
@@ -200,29 +200,29 @@ export const http = <T>(options: CustomRequestOptions) => {
             })
 
             // 判断平台，微信小程序自动登录重试，其他平台跳转登录页
-            if (PLATFORM.isWxMiniProgram && !isLoginApi(options.url)) {
-              // 检查是否已重试过，防止无限重试
-              const retryCount = options._retryCount || 0
-              if (retryCount < 1) {
-                // 自动登录并重试
-                onWxLogin()
-                  .then((loginResult) => {
-                    if (loginResult) {
-                      // 登录成功，重试请求
-                      retryRequest<T>(options).then(resolve).catch(reject)
-                    } else {
-                      // 登录失败（可能是新用户），静默处理，不强制跳转登录页
-                      // 让用户继续体验，需要登录时再提示
-                      reject(res)
-                    }
-                  })
-                  .catch(() => {
-                    // 登录异常，静默处理
-                    reject(res)
-                  })
-                return
-              }
-            }
+            // if (PLATFORM.isWxMiniProgram && !isLoginApi(options.url)) {
+            //   // 检查是否已重试过，防止无限重试
+            //   const retryCount = options._retryCount || 0
+            //   if (retryCount < 1) {
+            //     // 自动登录并重试
+            //     onWxLogin()
+            //       .then((loginResult) => {
+            //         if (loginResult) {
+            //           // 登录成功，重试请求
+            //           retryRequest<T>(options).then(resolve).catch(reject)
+            //         } else {
+            //           // 登录失败（可能是新用户），静默处理，不强制跳转登录页
+            //           // 让用户继续体验，需要登录时再提示
+            //           reject(res)
+            //         }
+            //       })
+            //       .catch(() => {
+            //         // 登录异常，静默处理
+            //         reject(res)
+            //       })
+            //     return
+            //   }
+            // }
 
             // 其他平台或已重试过，静默处理（不强制跳转登录页，让用户继续体验）
             reject(res)

@@ -22,7 +22,6 @@
       @scrolltolower="handleScrollToBottom"
     >
       <view class="page-container pb-40">
-
         <view
           class="box-white p-30 item-30"
           v-for="item in payRecordList"
@@ -66,13 +65,14 @@
           </view>
         </view>
 
-        <ListMore :params="{
-          isLoading: isLoading,
-          isNoMore: !pageInfo?.hasNextPage,
-          isEmpty: payRecordList.length === 0
-        }" />
+        <ListMore
+          :params="{
+            isLoading: isLoading,
+            isNoMore: !pageInfo?.hasNextPage,
+            isEmpty: payRecordList.length === 0,
+          }"
+        />
       </view>
-
     </scroll-view>
   </view>
 </template>
@@ -93,7 +93,7 @@ const navHeight = ref(0)
 const params = ref({
   pageIndex: 1,
   pageSize: 10,
-  rechargeApplyType: 1
+  rechargeApplyType: 1,
 })
 
 // 获取导航栏高度
@@ -126,18 +126,20 @@ const getPayRecordList = async (appointPage = 0) => {
     if (appointPage > 0) {
       // 只更新对应页的数据
       let oldItems = payRecordList.value || []
-      oldItems = oldItems.filter(v => {
-        if (v.page_index === arg.pageIndex) {
-          return list.find((t) => t.id === v.id)
-        }
-        return true
-      }).map((v) => {
-        const matchItem = list.find((t) => t.id === v.id)
-        if (matchItem) {
-          v = matchItem
-        }
-        return v
-      })
+      oldItems = oldItems
+        .filter((v) => {
+          if (v.page_index === arg.pageIndex) {
+            return list.find((t) => t.id === v.id)
+          }
+          return true
+        })
+        .map((v) => {
+          const matchItem = list.find((t) => t.id === v.id)
+          if (matchItem) {
+            v = matchItem
+          }
+          return v
+        })
       payRecordList.value = oldItems
     } else {
       pageInfo.value = res
@@ -147,7 +149,7 @@ const getPayRecordList = async (appointPage = 0) => {
   if (isRefreshing.value) {
     uni.showToast({
       title: '刷新成功',
-      icon: 'success'
+      icon: 'success',
     })
     isRefreshing.value = false
   }
@@ -184,9 +186,9 @@ onMounted(() => {
 }
 
 .record-title {
+  flex: 1;
   font-size: 32rpx;
   font-weight: bold;
-  flex: 1;
 }
 
 .Infobox {
@@ -194,28 +196,24 @@ onMounted(() => {
 }
 
 .record-text {
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 20rpx;
   font-size: 28rpx;
-  display: flex;
   color: #999;
-  justify-content: space-between;
 }
-
 /** 待审核 */
 .status-10 {
   color: var(--warning-color);
 }
-
 /** 审核通过 */
 .status-20 {
   color: var(--success-color);
 }
-
 /** 审核不通过 */
 .status-30 {
   color: var(--danger-color);
 }
-
 /** 已取消 */
 .status-40 {
   color: var(--danger-color);
@@ -259,7 +257,7 @@ onMounted(() => {
 }
 
 .record-recevier {
-  color: #999;
   font-size: 28rpx;
+  color: #999;
 }
 </style>
