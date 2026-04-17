@@ -111,9 +111,8 @@
           <text class="total-label">合计：</text>
           <text class="total-price">¥{{ selectedTotalPrice }}</text>
         </view>
-        <!-- 有余额这种东西吗？ 没有的话删掉即可 -->
         <view v-if="myWalletInfo" class="wallet-balance">
-          钱包余额：¥{{ myWalletInfo.balance }}
+          钱包余额：¥{{ formatMoney(myWalletInfo.balance) }}
         </view>
       </view>
       <view class="right-section">
@@ -138,14 +137,14 @@
 
         <scroll-view scroll-y class="popup-scroll">
           <view class="popup-summary">
-            物业费汇总：
+            费用汇总：
             <text>¥{{ propertyTotal }}</text>
           </view>
 
           <view class="popup-detail-box" v-for="(item, index) in selectedBills" :key="item.id">
-            <view class="fee-row" v-for="(detail, dIndex) in item.details" :key="dIndex">
-              <text class="fee-label">{{ detail.name }}：</text>
-              <text class="fee-value">¥{{ detail.value }}</text>
+            <view class="fee-row">
+              <text class="fee-label">{{ item.itemName }}：</text>
+              <text class="fee-value">¥{{ item.billAmount }}</text>
             </view>
           </view>
 
@@ -191,6 +190,7 @@ import { getBillListApi, myWalletApi } from '@/service/bill'
 import { useLoginStore } from '@/store'
 import { storeToRefs } from 'pinia'
 import { BillPayStatusEnum, BillPayStatusValueEnum } from '@/enum/billPayStatusEnum'
+import { formatMoney } from '@/utils/num'
 
 const message = useMessage()
 
@@ -218,7 +218,7 @@ const { allRect: outScrollHeight } = useDomRect(
 )
 
 const loginStore = useLoginStore()
-const { loginInfo, userId } = storeToRefs(loginStore)
+const { loginInfo } = storeToRefs(loginStore)
 
 // 使用useLoadPageList钩子
 const {
@@ -244,7 +244,7 @@ const {
     // 结束日期
     // effectiveTimeEnd: '',
     // || defaultDateRange.value[1],
-    ownerId: userId.value,
+    ownerId: loginInfo.value?.userInfo?.id,
   },
   {
     isAutoLoad: true,
@@ -305,7 +305,7 @@ const onStatusConfirm = (res: any) => {
 const selectedTotalPrice = computed(() => {
   const total = list.value
     .filter((item: any) => item.checked)
-    .reduce((sum: number, item: any) => sum + Number(item.totalAmount), 0)
+    .reduce((sum: number, item: any) => sum + Number(item.billAmount), 0)
   return total.toFixed(2)
 })
 
@@ -355,13 +355,7 @@ const openPayPopup = () => {
 const confirmPay = () => {
   if (!isAgreed.value) {
     uni.showToast({ title: '请先阅读并同意服务协议', icon: 'none' })
-    return
   }
-  uni.showLoading({ title: '拉起收银台...' })
-  setTimeout(() => {
-    uni.hideLoading()
-    showPayPopup.value = false
-  }, 1500)
 }
 
 const onCreateCertificate = () => {
@@ -371,11 +365,10 @@ const onCreateCertificate = () => {
 const myWalletInfo = ref()
 const onLoadMyWallet = async () => {
   const res = await myWalletApi({
-    userId,
+    userId: loginInfo.value?.userInfo?.id,
   })
-  console.log({ res })
   if (res?.data?.rows?.length) {
-    const myWallet = res?.data?.rows.find((item) => item.userId === userId.value)
+    const myWallet = res?.data?.rows.find((item) => item.userId === loginInfo.value?.userInfo?.id)
     if (myWallet) {
       myWalletInfo.value = myWallet
     }

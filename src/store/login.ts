@@ -35,7 +35,8 @@ export const useLoginStore = defineStore(
     // token
     const token = computed(() => loginInfo.value?.accessToken)
 
-    const userId = computed(() => loginInfo.value?.userInfo?.id)
+    // userId
+    const userId = computed(() => loginInfo.value?.userInfo?.id || 0)
 
     /** 设置用户登录信息 */
     const setLoginInfo = (val: ILoginRes) => {

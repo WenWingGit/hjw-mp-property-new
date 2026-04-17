@@ -7,3 +7,7 @@ export const getBillListApi = (params: any) => {
 export const myWalletApi = (params: any) => {
   return http.get<any>('/api/admin/wallet', params)
 }
+
+export const paymentRecordListApi = (params: any) => {
+  return http.get<any>('/api/admin/payment-record', params)
+}

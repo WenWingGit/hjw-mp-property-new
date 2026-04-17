@@ -1,7 +1,7 @@
 <route lang="json5">
 {
   style: {
-    navigationBarTitleText: '预缴物业费',
+    navigationBarTitleText: '钱包充值',
     hidesTabBar: true,
     navigationStyle: 'custom',
     navigationBarTextStyle: 'white',
@@ -10,34 +10,37 @@
 </route>
 <template>
   <view class="recharge-page">
-    <NavTopBar bg-color="#fff" title-color="#1a1a1a" btn-theme="black" title="预缴物业费" />
+    <NavTopBar bg-color="#fff" title-color="#1a1a1a" btn-theme="black" title="钱包充值" />
 
     <image class="page-top-bg" src="@/static/images/fee_top_bg.jpg" mode="widthFix" />
 
     <view class="wallet-balance-wrap">
       <view class="wallet-balance">钱包余额(元)</view>
-      <view class="wallet-balance-amount">{{ total_balance }}</view>
+      <view class="wallet-balance-amount">{{ formatMoney(myWalletInfo.balance) }}</view>
     </view>
 
     <view class="fee-wrap">
       <view class="page-container">
-        <view class="fee-item-title">选择缴费的金额(元)</view>
+        <view class="fee-item-title">选择充值的金额(元)</view>
 
         <!-- 添加金额列表 -->
         <view class="amount-list">
           <view
-            class="amount-item {{ selected_amount === item.value ? 'active' : '' }}"
-            v-for="(item, index) in amount_list"
+            class="amount-item"
+            :class="{
+              active: selected_amount === item.value,
+            }"
+            v-for="item in amount_list"
             :key="item.id"
             @click="handleSelectAmount(item)"
           >
             ¥{{ item.value }}
-            <image
+            <wd-icon
               v-if="selected_amount === item.value"
               class="icon-choosed"
-              src="@/static/images/svg/a19.svg"
-              mode="aspectFit"
-            />
+              name="check-circle-filled"
+              size="20px"
+            ></wd-icon>
           </view>
         </view>
 
@@ -45,7 +48,8 @@
         <view class="custom-amount">
           <view class="custom-amount-title">自定义金额</view>
           <view
-            class="input-wrap {{ is_select_custom_amount ? 'on' : '' }}"
+            class="input-wrap"
+            :class="{ on: is_select_custom_amount }"
             @click="handleSelectCustomAmount"
           >
             <text class="currency">金额</text>
@@ -157,15 +161,32 @@
 import { ref, onMounted } from 'vue'
 import NavTopBar from '@/components/applet/NavTopBar.vue'
 import PagePopup from '@/components/common/PagePopup.vue'
-import {
-  getPropertyAmountListApi,
-  submitPropertyRechargeApi,
-  getQrCodeApi,
-} from '@/service/common/common'
-import { getHouseWalletBalanceApi } from '@/service/user'
+import { submitPropertyRechargeApi } from '@/service/common/common'
 
 import { formatMoney } from '@/utils/num'
-import { SCAN_PAY_URL } from '@/configs/index'
+import { myWalletApi } from '@/service/bill'
+import { useLoginStore } from '@/store'
+import { storeToRefs } from 'pinia'
+
+const loginStore = useLoginStore()
+const { loginInfo } = storeToRefs(loginStore)
+
+const myWalletInfo = ref()
+const onLoadMyWallet = async () => {
+  const res = await myWalletApi({
+    userId: loginInfo.value?.userInfo?.id,
+  })
+  if (res?.data?.rows?.length) {
+    const myWallet = res?.data?.rows.find((item) => item.userId === loginInfo.value?.userInfo?.id)
+    if (myWallet) {
+      myWalletInfo.value = myWallet
+    }
+  }
+}
+
+onLoad(() => {
+  onLoadMyWallet()
+})
 
 const selected_amount = ref<number | null>(null)
 const amount_list = ref<any[]>([
@@ -194,32 +215,6 @@ const paySteps = [
   '从相册选择刚保存的收款码',
   '完成支付后点击【我已支付】',
 ]
-
-// 获取物业钱包余额
-const getHouseWalletBalance = async () => {
-  const [err, res] = await getHouseWalletBalanceApi()
-  if (!err) {
-    const count = res?.propertyWallet ?? 0
-    total_balance.value = formatMoney(count / 100)
-  }
-}
-
-// 获取物业缴费金额列表
-const getPropertyAmountList = async () => {
-  const [err, res] = await getPropertyAmountListApi()
-  if (!err && Array.isArray(res)) {
-    const list = res.map((item) => ({ value: item.amount / 100, id: item.id }))
-    amount_list.value = list
-  }
-}
-
-// 获取二维码
-const getQrCode = async () => {
-  const [err, res] = await getQrCodeApi()
-  if (!err) {
-    pay_qrcoder_url.value = res.qrCodeUrl
-  }
-}
 
 // 选择金额
 const handleSelectAmount = (item: any) => {
@@ -288,8 +283,8 @@ const handleConfirmPay = async () => {
     params.customAmount = custom_amount.value
   }
 
-  const [err, res] = await submitPropertyRechargeApi(params)
-  if (!err) {
+  const res = await submitPropertyRechargeApi(params)
+  if (!res) {
     is_show_comfirm_pay_popup.value = false
     is_show_pay_popup.value = true
   }
@@ -305,17 +300,10 @@ const handleHavePaid = () => {
   })
 }
 
-// 导航到扫码支付
-const handleNavToScanPay = () => {
-  uni.navigateTo({
-    url: `/pages/webView/webView?url=${encodeURIComponent(SCAN_PAY_URL)}&openAfterBack=1`,
-  })
-}
-
 // 导航到充值记录
 const handleNavToPayRecord = () => {
   uni.navigateTo({
-    url: '/pages/rechargeRecord/rechargeRecord',
+    url: '/pages/rechargeRecord/rechargeRecord?walletId=' + myWalletInfo.value?.id,
   })
 }
 
@@ -333,13 +321,8 @@ const handleNavToAgreement = () => {
   })
 }
 
-onMounted(async () => {
-  await getPropertyAmountList()
-  await getQrCode()
-})
-
 onShow(async () => {
-  await getHouseWalletBalance()
+  onLoadMyWallet()
 })
 </script>
 
@@ -405,13 +388,14 @@ onShow(async () => {
       align-items: center;
       justify-content: center;
       width: calc(33.33% - 10px);
-      padding: 32rpx 0;
+      padding: 42rpx 0;
       background-color: #f8f9fb;
+      border: 2rpx solid #f8f9fb;
       border-radius: 16rpx;
 
       &.active {
         background-color: rgba(255, 153, 0, 0.05);
-        border-color: var(--primary-color);
+        border: 2rpx solid var(--primary-color);
       }
 
       .icon-choosed {
@@ -420,6 +404,7 @@ onShow(async () => {
         bottom: 0;
         width: 50rpx;
         height: 50rpx;
+        color: var(--primary-color);
       }
     }
   }
@@ -438,6 +423,7 @@ onShow(async () => {
       align-items: center;
       padding: 24rpx 32rpx;
       background-color: #f8f9fb;
+      border: 2rpx solid #f8f9fb;
       border-radius: 16rpx;
 
       &.on {

@@ -10,58 +10,90 @@
 </route>
 <template>
   <view class="recharge-record-page">
-    <NavTopBar bg-color="#fff" title-color="#1a1a1a" btn-theme="black" title="充值记录" />
+    <NavTopBar
+      id="page-nav-bar-wrapper"
+      bg-color="#fff"
+      title-color="#1a1a1a"
+      btn-theme="black"
+      title="充值记录"
+    />
+
+    <view id="gap" class="sx-pb-15"></view>
 
     <scroll-view
-      class="mt-15"
-      style="height: calc(100vh - 15rpx - {{ navHeight }})"
+      :style="{ height: 'calc(100vh - ' + outScrollHeight + ')' }"
       scroll-y
       refresher-enabled
       :refresher-triggered="isRefreshing"
       @refresherrefresh="handleRefresh"
       @scrolltolower="handleScrollToBottom"
     >
-      <view class="page-container pb-40">
+      <view class="page-container sx-pb-40">
         <view
-          class="box-white p-30 item-30"
+          class="box-white sx-p-30 item-30"
           v-for="item in payRecordList"
           :key="item.id"
           @tap="onClickItem(item)"
         >
-          <view class="flex j-s a-c">
-            <view class="record-title">充值金额：{{ item.amountStr }}</view>
-            <view :class="['status', `status-${item.applyStatus}`]">{{ item.applyStatusStr }}</view>
+          <view class="flex justify-between items-center">
+            <view class="record-title">充值金额：¥{{ item.amount }}</view>
+            <view :class="['status', `status-${item.paymentStatus}`]">
+              {{
+                item.paymentStatus === '0'
+                  ? '处理中'
+                  : item.paymentStatus === '1'
+                    ? '成功'
+                    : item.paymentStatus === '2'
+                      ? '失败'
+                      : '未知'
+              }}
+            </view>
           </view>
-          <view class="Infobox p-30 mt-30">
+
+          <view class="Infobox sx-p-30 sx-mt-30">
             <view class="record-text">
-              <view>业主：</view>
-              <view>{{ item.payUserName }}</view>
+              <view>收款方：</view>
+              <view>{{ item.payee || '暂无' }}</view>
             </view>
+
+            <view class="record-text" v-if="item.payer">
+              <view>付款方：</view>
+              <view>{{ item.payer }}</view>
+            </view>
+
             <view class="record-text">
-              <view>业主手机号：</view>
-              <view>{{ item.payUserMappingPhone }}</view>
-            </view>
-            <view class="record-text">
-              <view>业主小区：</view>
-              <view>{{ item.houseStr }}</view>
-            </view>
-            <view class="record-text">
-              <view>提交时间：</view>
-              <view>{{ item.createdTime }}</view>
-            </view>
-            <block v-if="item.discount > 0">
-              <view class="record-text">
-                <view>折扣：</view>
-                <view>{{ item.discountStr }}</view>
+              <view>支付用途：</view>
+              <view>
+                {{
+                  item.paymentPurpose === '0'
+                    ? '预存'
+                    : item.paymentPurpose === '1'
+                      ? '缴费'
+                      : '其他'
+                }}
               </view>
-              <view class="record-text">
-                <view>折扣后金额：</view>
-                <view>{{ item.discountedAmountStr }}</view>
-              </view>
-            </block>
+            </view>
+
+            <view class="record-text">
+              <view>创建时间：</view>
+              <view>{{ item.createTime }}</view>
+            </view>
+
+            <view class="record-text" v-if="item.paymentTime">
+              <view>支付时间：</view>
+              <view>{{ item.paymentTime }}</view>
+            </view>
           </view>
-          <view v-if="item.auditRemark" class="flex record-recevier mt-30">
-            审核备注：{{ item.auditRemark }}
+
+          <view
+            v-if="item.paymentStatus === '2' && item.failReason"
+            class="flex record-recevier sx-mt-30"
+          >
+            失败原因：{{ item.failReason }}
+          </view>
+
+          <view v-if="item.remark" class="flex record-recevier sx-mt-30">
+            备注：{{ item.remark }}
           </view>
         </view>
 
@@ -81,28 +113,32 @@
 import { ref, onMounted, computed } from 'vue'
 import NavTopBar from '@/components/applet/NavTopBar.vue'
 import ListMore from '@/components/common/ListMore.vue'
-import { getPropertyRechargeListApi } from '@/service/common/common'
+// import { getPropertyRechargeListApi } from '@/service/common/common'
 import { divide } from '@/utils/num'
+import { paymentRecordListApi } from '@/service/bill'
+import { PaymentPurposeEnum } from '@/enum/paymentPurposeEnum'
 
 const payRecordList = ref<any[]>([])
 const pageInfo = ref<any>(null)
 const isLoading = ref(false)
 const isRefreshing = ref(false)
-const navHeight = ref(0)
+
+const walletId = ref(0)
+onLoad((options) => {
+  walletId.value = options?.walletId
+  getPayRecordList()
+})
 
 const params = ref({
   pageIndex: 1,
   pageSize: 10,
-  rechargeApplyType: 1,
+  walletId: walletId.value,
+  paymentPurpose: PaymentPurposeEnum.Deposit,
 })
 
-// 获取导航栏高度
-const getNavHeight = () => {
-  const sysInfo = uni.getSystemInfoSync()
-  navHeight.value = sysInfo.statusBarHeight + 44
-}
+// 滚动内容以外的高度
+const { allRect: outScrollHeight } = useDomRect(['#page-nav-bar-wrapper', '#gap'], 'height')
 
-// 获取缴费记录
 const getPayRecordList = async (appointPage = 0) => {
   const arg = {
     ...params.value,
@@ -111,10 +147,10 @@ const getPayRecordList = async (appointPage = 0) => {
     arg.pageIndex = appointPage
   }
   isLoading.value = true
-  const [err, res] = await getPropertyRechargeListApi(arg)
+  const res = await paymentRecordListApi(arg)
   isLoading.value = false
-  if (!err && Array.isArray(res?.rows)) {
-    let list = res?.rows ?? []
+  if (res?.data?.rows) {
+    let list = res?.data?.rows ?? []
     list = list.map((item) => {
       item.amount = divide(item.amount, 100)
       return {
@@ -168,26 +204,16 @@ const handleScrollToBottom = () => {
     getPayRecordList()
   }
 }
-
-const onClickItem = (item: any) => {
-  // 直接显示在列表里，不跳去详情页
-}
-
-onMounted(() => {
-  getNavHeight()
-  getPayRecordList()
-})
 </script>
 
 <style lang="scss" scoped>
 .recharge-record-page {
-  min-height: 100vh;
-  background-color: #fff;
+  background-color: #f8f9fb;
 }
 
 .record-title {
   flex: 1;
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: bold;
 }
 
@@ -202,25 +228,18 @@ onMounted(() => {
   font-size: 28rpx;
   color: #999;
 }
-/** 待审核 */
-.status-10 {
+.status {
+  font-size: 26rpx;
+}
+// 支付状态（0-处理中，1-成功，2-失败）
+.status-0 {
   color: var(--warning-color);
 }
-/** 审核通过 */
-.status-20 {
+.status-1 {
   color: var(--success-color);
 }
-/** 审核不通过 */
-.status-30 {
+.status-2 {
   color: var(--danger-color);
-}
-/** 已取消 */
-.status-40 {
-  color: var(--danger-color);
-}
-
-.mt-15 {
-  margin-top: 15rpx;
 }
 
 .box-white {
@@ -228,32 +247,8 @@ onMounted(() => {
   border-radius: 16rpx;
 }
 
-.p-30 {
-  padding: 30rpx;
-}
-
 .item-30 {
   margin-bottom: 30rpx;
-}
-
-.mt-30 {
-  margin-top: 30rpx;
-}
-
-.pb-40 {
-  padding-bottom: 40rpx;
-}
-
-.flex {
-  display: flex;
-}
-
-.j-s {
-  justify-content: space-between;
-}
-
-.a-c {
-  align-items: center;
 }
 
 .record-recevier {
