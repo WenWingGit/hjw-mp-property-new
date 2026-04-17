@@ -16,7 +16,7 @@
 
     <view class="wallet-balance-wrap">
       <view class="wallet-balance">钱包余额(元)</view>
-      <view class="wallet-balance-amount">{{ formatMoney(myWalletInfo.balance) }}</view>
+      <view class="wallet-balance-amount">{{ formatMoney(myWalletInfo?.balance) }}</view>
     </view>
 
     <view class="fee-wrap">
@@ -78,7 +78,7 @@
     </view>
 
     <!-- 支付确认弹窗 -->
-    <PagePopup v-model:visible="is_show_comfirm_pay_popup" title="缴费信息">
+    <PagePopup v-model:show="is_show_comfirm_pay_popup" title="缴费信息">
       <view class="custom-amount">
         <view class="input-wrap">
           <text class="currency">金额</text>
@@ -91,26 +91,12 @@
       </view>
 
       <view class="flex mb-40 fz-26 my-30">
-        <image
-          v-if="!is_agree"
-          class="icon-checkbox"
-          src="@/static/images/svg/a48.svg"
-          mode="aspectFit"
-          @click="is_agree = true"
-        />
-        <image
-          v-else
-          class="icon-checkbox"
-          src="@/static/images/svg/a47.svg"
-          mode="aspectFit"
-          @click="is_agree = false"
-        />
-        <view class="ml-10 flex-1 color-999" @click="is_agree = !is_agree">
-          我已核实
-          <text class="color-primary">收费人物业管理处、收费项目</text>
-          的真实性，并阅读了
-          <text @click="handleNavToAgreement" class="color-primary">《服务协议》</text>
-          ，我同意支付费用。
+        <view class="agreement-box">
+          <wd-checkbox v-model="is_agree" checked-color="#ff8c00" size="16px">
+            <text class="agreement-text">
+              我已核实收费人物业管理处、收费项目的真实性，并阅读了《服务协议》，我同意支付费用。
+            </text>
+          </wd-checkbox>
         </view>
       </view>
 
@@ -122,7 +108,7 @@
     </PagePopup>
 
     <!-- 支付弹窗 -->
-    <PagePopup v-model:visible="is_show_pay_popup" title="缴费信息">
+    <PagePopup v-model:show="is_show_pay_popup" title="缴费信息">
       <view class="fc flex-col pt-20">
         <image
           v-if="pay_qrcoder_url"
@@ -417,32 +403,31 @@ onShow(async () => {
       font-size: 28rpx;
       color: #666;
     }
+  }
+}
+.input-wrap {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  background-color: #f8f9fb;
+  border: 2rpx solid #f8f9fb;
+  border-radius: 16rpx;
 
-    .input-wrap {
-      display: flex;
-      align-items: center;
-      padding: 24rpx 32rpx;
-      background-color: #f8f9fb;
-      border: 2rpx solid #f8f9fb;
-      border-radius: 16rpx;
+  &.on {
+    border-color: var(--primary-color);
+  }
 
-      &.on {
-        border-color: var(--primary-color);
-      }
+  .currency {
+    margin-right: 16rpx;
+    font-size: 32rpx;
+    color: #333;
+  }
 
-      .currency {
-        margin-right: 16rpx;
-        font-size: 32rpx;
-        color: #333;
-      }
-
-      .amount-input {
-        flex: 1;
-        font-size: 32rpx;
-        color: #333;
-        text-align: right;
-      }
-    }
+  .amount-input {
+    flex: 1;
+    font-size: 32rpx;
+    color: #333;
+    text-align: right;
   }
 }
 
@@ -637,5 +622,29 @@ onShow(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.agreement-box {
+  margin-top: 10rpx;
+  margin-bottom: 40rpx;
+
+  :deep(.wd-checkbox) {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  :deep(.wd-checkbox__shape) {
+    transform: translateY(10rpx);
+  }
+  :deep(.wd-checkbox__label) {
+    flex: 1;
+    margin-left: 16rpx;
+    line-height: 1.5;
+  }
+
+  .agreement-text {
+    font-size: 24rpx;
+    color: #999999;
+  }
 }
 </style>

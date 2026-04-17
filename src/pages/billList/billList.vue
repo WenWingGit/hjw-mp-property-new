@@ -94,7 +94,7 @@
           </view>
 
           <!-- 已缴费才显示 -->
-          <view class="fee-footer">
+          <view v-if="item.status === BillPayStatusEnum.Paid" class="fee-footer">
             <wd-button size="small" type="primary" @click="onCreateCertificate(item)">
               生成电子凭证
             </wd-button>
@@ -132,6 +132,7 @@
     <wd-popup
       v-model="showPayPopup"
       position="bottom"
+      :z-index="999"
       custom-style="border-radius: 24rpx 24rpx 0 0; overflow: hidden;"
     >
       <view class="popup-container">
@@ -170,7 +171,7 @@
               <text class="total-label">合计：</text>
               <text class="total-price">¥{{ finalTotal }}</text>
             </view>
-            <view class="wallet-balance">钱包余额：¥10.00</view>
+            <view class="wallet-balance">钱包余额：¥{{ formatMoney(myWalletInfo.balance) }}</view>
           </view>
           <view class="right-section">
             <button class="pay-btn" :class="{ disabled: !isAgreed }" @click="confirmPay">
@@ -193,7 +194,7 @@ import BuyBar from '@/components/swim/BuyBar.vue'
 // 默认选中今年1月1日到今天
 import dayjs from 'dayjs'
 import { useMessage } from 'wot-design-uni'
-import { getBillListApi, myWalletApi } from '@/service/bill'
+import { getBillListApi, h5unionorderApi, myWalletApi } from '@/service/bill'
 import { useLoginStore } from '@/store'
 import { storeToRefs } from 'pinia'
 import { BillPayStatusEnum, BillPayStatusValueEnum } from '@/enum/billPayStatusEnum'
@@ -255,6 +256,16 @@ const {
   },
   {
     isAutoLoad: true,
+    loadBefore: (pageQuery) => {
+      const _pageQuery = { ...pageQuery }
+      if (_pageQuery.startTimeStart) {
+        _pageQuery.startTimeStart = dayjs(_pageQuery.startTimeStart).format('YYYY-MM-DD')
+      }
+      if (_pageQuery.endTimeEnd) {
+        _pageQuery.endTimeEnd = dayjs(_pageQuery.endTimeEnd).format('YYYY-MM-DD')
+      }
+      return _pageQuery
+    },
     loadedCallBack: (resList) => {
       return (resList || []).map((item: any) => {
         return {
@@ -359,9 +370,22 @@ const openPayPopup = () => {
 }
 
 // 确认支付
-const confirmPay = () => {
+const confirmPay = async () => {
   if (!isAgreed.value) {
     uni.showToast({ title: '请先阅读并同意服务协议', icon: 'none' })
+  }
+
+  const res = await h5unionorderApi({
+    paymentPurpose: 1,
+    billId: selectedBills.value[0].id,
+    amount: parseFloat(propertyTotal.value),
+    walletId: myWalletInfo.value?.id,
+    lateFeeAmount: 0,
+    prepaidDeduction: 0,
+    paymentTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+  })
+  if (res?.code === '0000') {
+    debugger
   }
 }
 
@@ -400,6 +424,7 @@ const onLoadMyWallet = async () => {
   justify-content: space-around;
   height: 90rpx;
   background-color: #ffffff;
+  box-shadow: 0rpx 1rpx 20rpx 2rpx #e5e5e5;
 
   .filter-item {
     position: relative;

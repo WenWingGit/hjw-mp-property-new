@@ -4,7 +4,13 @@ import { $tips } from '@/utils/common'
 export default function (
   apiFn,
   defaultQuery,
-  { isAutoLoad = true, isShowLoading = false, request0Remove = [], loadedCallBack = () => {} } = {},
+  {
+    isAutoLoad = true,
+    isShowLoading = false,
+    request0Remove = [],
+    loadedCallBack = () => {},
+    loadBefore = () => {},
+  } = {},
 ) {
   const isRefreshLoading = ref(false)
 
@@ -59,8 +65,13 @@ export default function (
     if (isRefresh) {
       list.value.length = 0
     }
+    let _pageQuery = {
+      ...pageQuery,
+    }
+    if (typeof loadBefore === 'function') {
+      _pageQuery = loadBefore(_pageQuery)
+    }
 
-    const _pageQuery = { ...pageQuery }
     if (appointPage > 0) {
       _pageQuery.page = appointPage
     }

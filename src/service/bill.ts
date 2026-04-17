@@ -11,3 +11,8 @@ export const myWalletApi = (params: any) => {
 export const paymentRecordListApi = (params: any) => {
   return http.get<any>('/api/admin/payment-record', params)
 }
+
+/** 支付 */
+export const h5unionorderApi = (params: any) => {
+  return http.post<any>('/api/admin/payment-record/h5unionorder', params)
+}
