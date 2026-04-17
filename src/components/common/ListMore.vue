@@ -15,7 +15,7 @@
   </template>
   <template v-else>
     <NoMore v-if="!props.params.isEmpty && props.params.isNoMore" />
-    <Empty v-if="props.params.isEmpty" />
+    <Empty v-if="props.params.isEmpty" :text="emptyText" />
   </template>
 </template>
 
@@ -35,6 +35,10 @@ const props = defineProps({
       }
     },
   },
+  emptyText: {
+    type: String,
+    value: '',
+  },
   isRefreshLoading: {
     type: Boolean,
     default: false,
@@ -45,8 +49,8 @@ const props = defineProps({
 <style lang="scss" scoped>
 .more {
   overflow: hidden;
-  text-align: center;
   color: #999999;
+  text-align: center;
 }
 .more .text {
   display: inline-block;

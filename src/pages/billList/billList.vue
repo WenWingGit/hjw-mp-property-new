@@ -101,7 +101,14 @@
           </view>
         </view>
 
-        <ListMore :page-info="pageInfo" empty-text="暂无账单记录" />
+        <ListMore
+          :params="{
+            isLoading: pageInfo.isLoading,
+            isNoMore: !pageInfo?.hasNextPage,
+            isEmpty: list.length === 0,
+          }"
+          empty-text="账单为空"
+        />
       </view>
     </scroll-view>
 
@@ -239,10 +246,10 @@ const {
     // 状态
     status: 0,
     // 开始日期
-    // effectiveTimeStart: '',
+    startTimeStart: '',
     //  || defaultDateRange.value[0],
     // 结束日期
-    // effectiveTimeEnd: '',
+    endTimeEnd: '',
     // || defaultDateRange.value[1],
     ownerId: loginInfo.value?.userInfo?.id,
   },
@@ -279,8 +286,8 @@ const onDateConfirm = (value: any) => {
     const startStr = formatDate(new Date(startDate))
     const endStr = formatDate(new Date(endDate))
     dateRangeText.value = `${startStr}-${endStr}`
-    pageQuery.effectiveTimeStart = startStr
-    pageQuery.effectiveTimeEnd = endStr
+    pageQuery.startTimeStart = startStr
+    pageQuery.endTimeEnd = endStr
     onInitList()
   }
 }
@@ -288,8 +295,8 @@ const onDateConfirm = (value: any) => {
 const onDateReset = () => {
   defaultDateRange.value = defaultDateRangeValue
   dateRangeText.value = '全部日期'
-  pageQuery.effectiveTimeStart = ''
-  pageQuery.effectiveTimeEnd = ''
+  pageQuery.startTimeStart = ''
+  pageQuery.endTimeEnd = ''
   onInitList()
 }
 

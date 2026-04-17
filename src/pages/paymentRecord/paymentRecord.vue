@@ -36,7 +36,7 @@
           @tap="onClickItem(item)"
         >
           <view class="flex justify-between items-center">
-            <view class="record-title">充值金额：¥{{ item.amount }}</view>
+            <view class="record-title">支付金额：¥{{ item.amount }}</view>
             <view :class="['status', `status-${item.paymentStatus}`]">
               {{
                 item.paymentStatus === '0'
@@ -133,7 +133,7 @@ const params = ref({
   pageIndex: 1,
   pageSize: 10,
   walletId: walletId.value,
-  paymentPurpose: PaymentPurposeEnum.Deposit,
+  paymentPurpose: PaymentPurposeEnum.Payment,
 })
 
 // 滚动内容以外的高度
