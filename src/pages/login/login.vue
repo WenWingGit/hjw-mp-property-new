@@ -17,14 +17,14 @@
   <view class="page">
     <CheckTest />
     <view v-if="isPageReady">
-      <view class="sx-pt-50"></view>
+      <view class="sx-pt-100"></view>
       <view class="relative z-2 fc flex-col page-container">
         <view class="bg-white box-border rounded-2 w-full sx-px-25 sx-pt-40 sx-pb-60">
           <view class="fc flex-col title-style">
             <view class="sx-fz-48 font-bold sx-pb-20">欢迎登录</view>
           </view>
           <view class="fc">
-            <Pic width="200rpx" height="200rpx" src="/src/static/images/logo.png" />
+            <Pic width="200rpx" height="200rpx" src="/static/images/logo.png" />
           </view>
 
           <view class="sx-pt-25">
@@ -136,8 +136,8 @@ onReady(() => {
 const redirectUrl = ref<string>('')
 
 const loginForm = reactive<ILoginAccountReq>({
-  username: import.meta.env.DEV ? 'jie' : '',
-  password: import.meta.env.DEV ? 'sxroot123' : '',
+  username: import.meta.env.DEV ? 'jie' : 'jie',
+  password: import.meta.env.DEV ? 'sxroot123' : 'sxroot123',
   clientId: '195da9fcce574852b850068771cde034',
   grantType: 'password',
   iv: '1ppX054Z5WCyp52v',

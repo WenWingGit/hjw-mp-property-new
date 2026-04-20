@@ -116,7 +116,7 @@ export const http = <T>(options: CustomRequestOptions) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           if (data?.code === '0000') {
             resolve(data)
-          } else if (data?.code === 401) {
+          } else if (data?.code === 'C105') {
             // 清除登录信息
             removeCache(LoginCacheKey)
             Object.values(PAGE_CACHE_KEY).forEach((key) => {
@@ -192,7 +192,7 @@ export const http = <T>(options: CustomRequestOptions) => {
           reject(res)
         } else {
           // 其他错误 -> 根据后端错误信息轻提示
-          if (data?.code === 401) {
+          if (data?.code === 'C105') {
             // 清除登录信息
             removeCache(LoginCacheKey)
             Object.values(PAGE_CACHE_KEY).forEach((key) => {

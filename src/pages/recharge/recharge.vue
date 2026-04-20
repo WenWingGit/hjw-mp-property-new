@@ -257,6 +257,11 @@ const handleConfirmPay = async () => {
     return
   }
 
+  uni.showToast({
+    title: '对接中',
+    icon: 'none',
+  })
+
   const params: any = {
     rechargeAmountSettingId: 0,
     customAmount: '',

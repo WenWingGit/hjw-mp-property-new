@@ -10,7 +10,7 @@ interface NavigateToOptions {
        "/pages/login/changePassword" |
        "/pages/login/login" |
        "/pages/login/register" |
-       "/pages/login/wxLogin" |
+       "/pages/login/_wxLogin" |
        "/pages/paymentRecord/paymentRecord" |
        "/pages/recharge/recharge" |
        "/pages/rechargeRecord/rechargeRecord";

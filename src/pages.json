@@ -76,7 +76,7 @@
       }
     },
     {
-      "path": "pages/login/wxLogin",
+      "path": "pages/login/_wxLogin",
       "type": "page",
       "style": {
         "navigationBarTitleText": "登录",

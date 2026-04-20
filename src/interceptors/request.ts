@@ -39,9 +39,9 @@ const httpInterceptor = {
     ) {
       autoLoginTriggered = true
       // 静默登录，不等待结果，不阻塞请求
-      onWxLogin().catch(() => {
-        // 登录失败静默处理，可能是新用户
-      })
+      // onWxLogin().catch(() => {
+      //   // 登录失败静默处理，可能是新用户
+      // })
     }
     // 接口请求支持通过 query 参数配置 queryString
     if (options.query) {

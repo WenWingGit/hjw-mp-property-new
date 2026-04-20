@@ -27,7 +27,10 @@
             <view class="sx-fz-40 font-bold sx-pt-30 sx-pb-80">欢迎登录</view>
           </view>
           <view class="fc">
-            <Pic width="200rpx" height="200rpx" src="/static/images/icon_logo_has_name.svg" />
+            <image
+              style="width: 200rpx; height: 200rpx"
+              src="/static/images/icon_logo_has_name.svg"
+            ></image>
           </view>
 
           <view class="sx-pt-25">
@@ -171,17 +174,10 @@ const toast = useToast()
 const LoginPage = PageKey.LOGIN
 const HomePage = PageKey.INDEX
 
-const saveLoginInfoStore = useSaveLoginAccountStore()
 const loginStore = useLoginStore()
-
-const { saveLoginInfo } = storeToRefs(saveLoginInfoStore)
 
 onLoad((options) => {
   redirectUrl.value = decodeURIComponent(options.redirect)
-
-  if (typeof saveLoginInfoStore?.isAgree !== 'undefined') {
-    isAgree.value = saveLoginInfoStore.isAgree
-  }
 
   if (saveLoginInfo?.value) {
     const [_saveLoginInfo] = saveLoginInfo.value
@@ -320,7 +316,6 @@ const toggleAgree = (flag: boolean) => {
 const showAgreeTips = () => {
   if (!isAgree.value) {
     $tips('请先同意用户协议')
-    return
   }
 }
 
@@ -377,33 +372,33 @@ function handleNavToAgreement() {
   background-color: #f7f7f7;
 }
 .form {
+  padding: 0 34rpx;
+  overflow: hidden;
   background-color: #f7f7f7;
   border-radius: 30rpx;
-  overflow: hidden;
-  padding: 0 34rpx;
 }
 
 .f-item {
-  margin: 36rpx auto 42rpx;
-  width: 100%;
   position: relative;
+  width: 100%;
+  margin: 36rpx auto 42rpx;
 }
 
 .f-input-wrap {
+  box-sizing: border-box;
   width: 100%;
   height: 90rpx;
   padding: 0 20rpx !important;
   background-color: #fff;
-  box-sizing: border-box;
   border-radius: 20rpx;
 }
 
 :deep(.f-input) {
   position: relative;
-  overflow: hidden;
   // border-bottom: 2rpx solid #dedede;
   display: flex;
   align-items: center;
+  overflow: hidden;
 }
 
 :deep(.f-input-wrap .wd-input__inner) {
@@ -431,23 +426,23 @@ function handleNavToAgreement() {
 }
 
 .f-input-code {
-  z-index: 2;
   position: absolute;
-  right: 14rpx;
   top: 50%;
+  right: 14rpx;
+  z-index: 2;
   transform: translateY(-50%);
 }
 
 .send-code {
-  width: auto;
-  padding: 0 24rpx;
-  height: 60rpx;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background-color: #ef8200;
-  color: #fff;
+  justify-content: center;
+  width: auto;
+  height: 60rpx;
+  padding: 0 24rpx;
   font-size: 25rpx;
+  color: #fff;
+  background-color: #ef8200;
   border-radius: 16rpx;
 }
 </style>

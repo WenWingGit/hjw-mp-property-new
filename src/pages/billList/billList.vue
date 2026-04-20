@@ -94,11 +94,11 @@
           </view>
 
           <!-- 已缴费才显示 -->
-          <view v-if="item.status === BillPayStatusEnum.Paid" class="fee-footer">
+          <!-- <view v-if="item.status === BillPayStatusEnum.Paid" class="fee-footer">
             <wd-button size="small" type="primary" @click="onCreateCertificate(item)">
               生成电子凭证
             </wd-button>
-          </view>
+          </view> -->
         </view>
 
         <ListMore
@@ -374,19 +374,22 @@ const confirmPay = async () => {
   if (!isAgreed.value) {
     uni.showToast({ title: '请先阅读并同意服务协议', icon: 'none' })
   }
-
-  const res = await h5unionorderApi({
-    paymentPurpose: 1,
-    billId: selectedBills.value[0].id,
-    amount: parseFloat(propertyTotal.value),
-    walletId: myWalletInfo.value?.id,
-    lateFeeAmount: 0,
-    prepaidDeduction: 0,
-    paymentTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+  uni.showToast({
+    title: '支付功能待完成',
+    icon: 'none',
   })
-  if (res?.code === '0000') {
-    debugger
-  }
+
+  // const res = await h5unionorderApi({
+  //   paymentPurpose: 1,
+  //   billId: selectedBills.value[0].id,
+  //   amount: parseFloat(propertyTotal.value),
+  //   walletId: myWalletInfo.value?.id,
+  //   lateFeeAmount: 0,
+  //   prepaidDeduction: 0,
+  //   paymentTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+  // })
+  // if (res?.code === '0000') {
+  // }
 }
 
 const onCreateCertificate = () => {
