@@ -211,7 +211,7 @@ type IGetImageInfoSuccessData = UniApp.GetImageInfoSuccessData
 export function $getImageInfo(
   src: string,
   opt: IGetImageInfoOptions = {},
-): Promise<IGetImageInfoSuccessData> {
+): Promise<IGetImageInfoSuccessData | null> {
   if (!src) return Promise.resolve(null)
   return new Promise((resolve) => {
     uni.getImageInfo({
@@ -260,7 +260,7 @@ export function $getDomRect(
         if (Array.isArray(data) && data.length > 0) {
           resolve(data[0])
         } else if (data) {
-          resolve(data)
+          resolve(data as UniApp.NodeInfo)
         } else {
           resolve(null)
         }

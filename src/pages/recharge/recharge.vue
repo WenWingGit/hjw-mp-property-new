@@ -35,12 +35,9 @@
             @click="handleSelectAmount(item)"
           >
             ¥{{ item.value }}
-            <wd-icon
-              v-if="selected_amount === item.value"
-              class="icon-choosed"
-              name="check-circle-filled"
-              size="20px"
-            ></wd-icon>
+            <view v-if="selected_amount === item.value" class="icon-choosed">
+              <wd-icon name="check-circle-filled" size="20px"></wd-icon>
+            </view>
           </view>
         </view>
 

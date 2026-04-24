@@ -11,16 +11,11 @@ import {
 
 // 登录用wxPhoneCode
 export const loginByWxPhoneCodeApi = (params: ILoginByWxPhoneCodeReq) => {
-  return http.post<ILoginRes>('/WxMinApi/Auth/LoginByPhoneCode', params)
-}
-
-// 登录用wxcode
-export const loginByWxCodeApi = (params: ILoginByWxCodeReq) => {
-  return http.post<ILoginRes>('/WxMinApi/Auth/LoginByWxCode', params)
+  return http.post<ILoginRes>('/api/admin/wechat/mini/user/login', params)
 }
 
 // 登录
-export const doStoreLoginApi = (params: ILoginAccountReq) => {
+export const doStoreLoginApi = (params: ILoginByWxPhoneCodeReq) => {
   return http.post<ILoginRes>('/api/admin/auth/login', params)
 }
 
@@ -32,18 +27,4 @@ export const getUserInfoApi = () => {
 // 更新用户信息
 export const updateUserInfoApi = (params: IUpdateUserInfoReq) => {
   return http.post<IGetUserInfoRes>('/WxMinApi/WxMinUser/EditUserInfo', params)
-}
-
-// 获取验证码
-export const getCaptchaApi = (params: IGetCaptchaReq) => {
-  return http.post('/WxMinApi/Auth/SendVerificationCode', params)
-}
-
-// 绑定销售
-export const bindSalesUserApi = (salesUserId: number) => {
-  return http.post('/WxMinApi/Auth/BindSalesUser', { salesUserId })
-}
-
-export const getHouseWalletBalanceApi = () => {
-  return ''
 }

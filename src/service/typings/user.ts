@@ -1,13 +1,15 @@
-import { AccountTypeEnum } from '@/enum/accountTypeEnum'
 import { IdNumber } from '@/typings'
 
 // 登录请求
 export interface ILoginByWxPhoneCodeReq {
-  phoneCode: string
-  wxCode: string
-  encryptedData: string
-  iv: string
-  salesUserId: number
+  phoneCode?: string
+  // wxCode: string
+  // encryptedData: string
+  // iv: string
+  // salesUserId: number
+  clientId: string
+  grantType: string
+  code: string
 }
 
 // 登录请求
@@ -23,7 +25,7 @@ export interface ILoginAccountReq {
 /** 登录响应 */
 export interface ILoginRes {
   accessToken: string
-  // refreshToken: string
+  refreshToken?: string
   expireIn: number
   userInfo: IUserInfo
 }
@@ -59,7 +61,6 @@ export interface ILoginByWxCodeReq {
 /** 获取用户信息响应 */
 export interface IGetUserInfoRes {
   id: number
-  accountType: AccountTypeEnum
   avatar: string
   name: string
   phone: string

@@ -1,13 +1,11 @@
 <template>
-  <!-- <view class="loading-wrapper" :class="{ full }" :style="{ 'background-color': bg }">
-    <wd-loading :size="size" />
-  </view> -->
+  <view class="loading-wrapper" :class="{ full }" :style="{ 'background-color': bg }">
+    <wd-loading :size="size" :color="color || '#ff8c00'" />
+  </view>
   <view></view>
 </template>
 
 <script lang="ts" setup>
-// import { storeToRefs } from 'pinia'
-
 interface IProps {
   color?: string
   size?: number | string
@@ -20,11 +18,6 @@ const props = withDefaults(defineProps<IProps>(), {
   full: true,
   bg: 'transparent',
 })
-
-// const themeStore = useThemeStore()
-// const { curThemeColor } = storeToRefs(themeStore)
-//
-// const loadingColor = computed(() => props.color || curThemeColor.value)
 </script>
 
 <style lang="scss" scoped>

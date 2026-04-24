@@ -2,7 +2,7 @@
 {
   layout: 'default',
   style: {
-    navigationBarTitleText: '易联服务协议',
+    navigationBarTitleText: '汇景湾服务协议',
     navigationBarTextStyle: 'white',
   },
 }
@@ -11,7 +11,7 @@
 <template>
   <view class="page">
     <view class="relative z-2">
-      <NavTopBar bg-color="#000248" title="易联服务协议" show-back />
+      <NavTopBar bg-color="#ff8c00" title="汇景湾服务协议" show-back />
 
       <view class="page-container sx-pt-20 sx-pb-20">
         <view class="agreement-content box-white sx-p-36 sx-lh-60">

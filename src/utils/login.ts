@@ -4,12 +4,13 @@ import { getCache, removeCache, setCache } from './storage'
 import { AccessTokenCacheKey, LoginCacheKey, RefreshTokenCacheKey } from '@/store/storeName'
 import { deepClone } from './utils'
 
-import { loginByWxCodeApi } from '@/service/user'
+import { doStoreLoginApi } from '@/service/user'
 import { $loginSync, checkLogin } from '@/utils/common'
 import PAGE_CACHE_KEY from '@/maps/chaheKeys'
 import { useLoginStore } from '@/store'
 import { currRoute, getNeedLoginPages } from '@/utils/index'
 import { isWxMiniProgram } from '@/utils/platform'
+import { ILoginRes } from '@/service/typings/user'
 
 // 登录锁，用于防止并发登录
 let loginPromise: Promise<any> | null = null
@@ -44,7 +45,7 @@ export function getRefreshToken() {
  * @param accessToken
  * @param refreshToken
  */
-export function setLoginInfo(loginInfo, accessToken, refreshToken) {
+export function setLoginInfo(loginInfo: ILoginRes, accessToken: string, refreshToken: string) {
   const userLoginInfo = getCache(LoginCacheKey) || {}
   if (typeof userLoginInfo === 'object' && userLoginInfo !== null) {
     userLoginInfo.loginInfo = deepClone(loginInfo)
@@ -69,7 +70,7 @@ export function removeLoginInfo() {
  * @param accessToken
  * @param refreshToken
  */
-export function updateToken(accessToken, refreshToken) {
+export function updateToken(accessToken: string, refreshToken: string) {
   const loginInfo = getLoginInfo() || false
   if (!loginInfo) return
   accessToken = Array.isArray(accessToken) ? accessToken[0] : accessToken
@@ -107,26 +108,26 @@ export async function onWxLogin() {
   loginPromise = new Promise(async (resolve) => {
     try {
       const wxCode = await $loginSync()
-      let salesUserId = getCache(PAGE_CACHE_KEY.SalesUserId) || 0
-      const res = await loginByWxCodeApi({ wxCode, salesUserId })
+      const res = await doStoreLoginApi({
+        code: wxCode,
+        clientId: import.meta.env.VITE_APP_CLIENT_ID,
+        grantType: import.meta.env.VITE_APP_GRANT_TYPE,
+      })
 
       if (res.code !== 200) {
         setCache(PAGE_CACHE_KEY.WXLoginCode, '400')
         resolve(false)
       } else {
         const accessToken = res?.data?.accessToken
-        const refreshToken = res?.data?.refreshToken
+        // const refreshToken = res?.data?.refreshToken
         if (res?.success && res?.data) {
           const loginStore = useLoginStore()
           loginStore.setLoginInfo(res.data)
 
           setCache(AccessTokenCacheKey, accessToken)
-          setCache(RefreshTokenCacheKey, refreshToken)
+          // setCache(RefreshTokenCacheKey, refreshToken)
         }
         removeCache(PAGE_CACHE_KEY.WXLoginCode)
-        if (salesUserId) {
-          removeCache(PAGE_CACHE_KEY.SalesUserId)
-        }
         resolve(res.data)
       }
     } finally {

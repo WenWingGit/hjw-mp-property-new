@@ -1,8 +1,7 @@
-import { getCaptchaApi } from '@/service/user'
 import { $hideLoading, $showLoading, $tips } from '@/utils/common'
 import { ref, computed } from 'vue'
 
-export function useSendCode() {
+export function useSendCode(getCaptchaApi: any) {
   // 验证码
   const code = ref('')
   // 倒计时
@@ -21,7 +20,10 @@ export function useSendCode() {
   })
 
   // 发送验证码
-  const handleGetCode = async (phone: string, valiFn) => {
+  const handleGetCode = async (
+    phone: string,
+    valiFn: () => Promise<{ success: boolean; message: string }>,
+  ) => {
     if (timer.value > 0 || isSending.value) return
 
     // 校验手机号

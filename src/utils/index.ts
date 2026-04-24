@@ -1,16 +1,18 @@
-import { pages, subPackages,  } from '@/pages.json'
+import { pages, subPackages } from '@/pages.json'
 // tabBar
-const tabBar = []
+const tabBar = {
+  list: [],
+}
 /**
  * JS对象转URL字符串参数
  * @param {Object} obj - 待转换的对象
  * @param {Boolean} is_encode - 转码
  * @returns {string} - 转换成的请求字符串
  */
-export function obj2Url(obj: object, isEncode: boolean) {
-  const params = []
+export function obj2Url(obj: Record<string, any>, isEncode: boolean = true) {
+  const params: any[] = []
   Object.keys(obj).forEach((key) => {
-    let value = obj[key]
+    let value = obj[key] as any
     // 如果值为undefined我们将其置空
     if (typeof value === 'undefined') {
       value = ''
@@ -144,9 +146,12 @@ export const getNeedLoginPages = (): string[] => getAllPages('needLogin').map((p
 export const needLoginPages: string[] = getAllPages('needLogin').map((page) => page.path)
 
 /** 跳转登录 */
-export function navToLogin() {
+export function navToLogin(redirectUrl?: string) {
   uni.reLaunch({
-    url: import.meta.env.VITE_APP_LOGIN_PAGE,
+    url:
+      import.meta.env.VITE_APP_LOGIN_PAGE + redirectUrl?.length
+        ? `?redirectUrl=${redirectUrl}`
+        : '',
   })
 }
 
@@ -156,6 +161,3 @@ export function navToHome() {
     url: import.meta.env.VITE_APP_HOME_PAGE,
   })
 }
-
-// 导出分享工具函数
-export { isSalesRole, buildSharePath, handleSalesUserIdOnLoad } from './share'

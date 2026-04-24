@@ -48,7 +48,6 @@
                   placeholder="请输入密码"
                   v-model="loginForm.password"
                 />
-                <!-- :maxlength="20" -->
               </view>
             </view>
 
@@ -167,7 +166,7 @@ const handleSubmit = () => {
   $showLoading('登录中...')
 
   loginStore
-    .doLogin({ ...loginForm })
+    .doLoginByWxPhoneCode({ ...loginForm })
     .then((res) => {
       if (res) {
         jump()

@@ -48,6 +48,9 @@ interface ImportMetaEnv {
 
   readonly VITE_APP_LABEL_KEY: string
   readonly VITE_APP_VALUE_KEY: string
+
+  readonly VITE_APP_CLIENT_ID: string
+  readonly VITE_APP_GRANT_TYPE: string
 }
 
 interface ImportMeta {

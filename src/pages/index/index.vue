@@ -48,18 +48,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue'
-import AppIcon from '@/components/common/AppIcon/AppIcon.vue'
 import c1 from '@/static/images/c1.svg'
 import c2 from '@/static/images/c2.svg'
-import c3 from '@/static/images/c3.svg'
-import c4 from '@/static/images/c4.svg'
-import c5 from '@/static/images/c5.svg'
-import c6 from '@/static/images/c6.svg'
 import b1 from '@/static/images/b1.png'
 import GroupTitle from '@/components/swim/GroupTitle.vue'
-import { handleSalesUserIdOnLoad } from '@/utils'
 import { getLoginInfo } from '@/utils/login'
+import { PageKey } from '@/maps/pageKeys'
+import { obj2Url } from '@/utils'
 
 const menuList = [
   {
@@ -81,8 +76,11 @@ const menuList = [
 const handleNav = (path: string) => {
   const loginInfo = getLoginInfo()
   if (!loginInfo) {
+    const loginUrlEnd = obj2Url({
+      redirectUrl: path,
+    })
     uni.navigateTo({
-      url: '/pages/login/login',
+      url: `${PageKey.LOGIN}${loginUrlEnd}`,
     })
     return
   }

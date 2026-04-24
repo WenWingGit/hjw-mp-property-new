@@ -42,7 +42,7 @@
       "type": "page",
       "layout": "default",
       "style": {
-        "navigationBarTitleText": "易联服务协议",
+        "navigationBarTitleText": "汇景湾服务协议",
         "navigationBarTextStyle": "white"
       }
     },
@@ -74,6 +74,19 @@
       "style": {
         "navigationBarTitleText": "注册"
       }
+    },
+    {
+      "path": "pages/login/wxLogin",
+      "type": "page",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "app-plus": {
+          "splashscreen": {
+            "autoShow": false
+          }
+        }
+      },
+      "layout": "noSideDefault"
     },
     {
       "path": "pages/login/_wxLogin",

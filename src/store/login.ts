@@ -7,7 +7,7 @@ import {
   ILoginRes,
   IUserInfo,
 } from '@/service/typings/user'
-import { doStoreLoginApi, getUserInfoApi, loginByWxPhoneCodeApi } from '@/service/user'
+import { doStoreLoginApi, getUserInfoApi } from '@/service/user'
 import { AccessTokenCacheKey, LoginCacheKey, RefreshTokenCacheKey } from './storeName'
 import { setCache } from '@/utils/storage'
 
@@ -55,28 +55,29 @@ export const useLoginStore = defineStore(
     }
 
     // 正式登录请使用此方法
-    const doLogin = async (params: ILoginAccountReq) => {
-      const res = await doStoreLoginApi(params)
-      const accessToken = res?.data?.accessToken
-      // const refreshToken = res?.data?.refreshToken
-      if (res?.data) {
-        setLoginInfo(res.data)
-        setCache(AccessTokenCacheKey, accessToken)
-        // setCache(RefreshTokenCacheKey, refreshToken)
-        return Promise.resolve(res)
-      }
-      return Promise.reject(res)
-    }
+    // const doLogin = async (params: ILoginAccountReq) => {
+    //   const res = await doStoreLoginApi(params)
+    //   const accessToken = res?.data?.accessToken
+    //   // const refreshToken = res?.data?.refreshToken
+    //   if (res?.data) {
+    //     setLoginInfo(res.data)
+    //     setCache(AccessTokenCacheKey, accessToken)
+    //     // setCache(RefreshTokenCacheKey, refreshToken)
+    //     return Promise.resolve(res)
+    //   }
+    //   return Promise.reject(res)
+    // }
 
     // 正式登录来自微信phoneCode
     const doLoginByWxPhoneCode = async (params: ILoginByWxPhoneCodeReq) => {
-      const res = await loginByWxPhoneCodeApi(params)
+      const res = await doStoreLoginApi(params)
+      debugger
       const accessToken = res?.data?.accessToken
-      // const refreshToken = res?.data?.refreshToken
-      if (res?.success && res?.data) {
+      const refreshToken = res?.data?.refreshToken
+      if (res?.data) {
         setLoginInfo(res.data)
         setCache(AccessTokenCacheKey, accessToken)
-        // setCache(RefreshTokenCacheKey, refreshToken)
+        setCache(RefreshTokenCacheKey, refreshToken)
         return Promise.resolve(res)
       }
       return Promise.reject(res)
@@ -100,7 +101,6 @@ export const useLoginStore = defineStore(
       getUserInfo,
       setUserInfo,
       clearUserInfo,
-      doLogin,
       doLoginByWxPhoneCode,
     }
   },

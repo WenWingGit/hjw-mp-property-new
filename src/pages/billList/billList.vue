@@ -94,11 +94,11 @@
           </view>
 
           <!-- 已缴费才显示 -->
-          <!-- <view v-if="item.status === BillPayStatusEnum.Paid" class="fee-footer">
+          <view class="fee-footer">
             <wd-button size="small" type="primary" @click="onCreateCertificate(item)">
               生成电子凭证
             </wd-button>
-          </view> -->
+          </view>
         </view>
 
         <ListMore
@@ -119,7 +119,7 @@
           <text class="total-price">¥{{ selectedTotalPrice }}</text>
         </view>
         <view v-if="myWalletInfo" class="wallet-balance">
-          钱包余额：¥{{ formatMoney(myWalletInfo.balance) }}
+          钱包余额：¥{{ formatMoney(myWalletInfo?.balance || 0) }}
         </view>
       </view>
       <view class="right-section">
@@ -157,11 +157,10 @@
           </view>
 
           <view class="agreement-box">
-            <wd-checkbox v-model="isAgreed" checked-color="#ff8c00" size="16px">
-              <text class="agreement-text">
-                我已核实收费人物业管理处、收费项目的真实性，并阅读了《服务协议》，我同意支付费用。
-              </text>
-            </wd-checkbox>
+            <wd-checkbox v-model="isAgreed" checked-color="#ff8c00" size="16px"></wd-checkbox>
+            <text class="agreement-text">
+              我已核实收费人物业管理处、收费项目的真实性，并阅读了《服务协议》，我同意支付费用。
+            </text>
           </view>
         </scroll-view>
 
@@ -171,7 +170,9 @@
               <text class="total-label">合计：</text>
               <text class="total-price">¥{{ finalTotal }}</text>
             </view>
-            <view class="wallet-balance">钱包余额：¥{{ formatMoney(myWalletInfo.balance) }}</view>
+            <view class="wallet-balance">
+              钱包余额：¥{{ formatMoney(myWalletInfo?.balance || 0) }}
+            </view>
           </view>
           <view class="right-section">
             <button class="pay-btn" :class="{ disabled: !isAgreed }" @click="confirmPay">
@@ -194,7 +195,7 @@ import BuyBar from '@/components/swim/BuyBar.vue'
 // 默认选中今年1月1日到今天
 import dayjs from 'dayjs'
 import { useMessage } from 'wot-design-uni'
-import { getBillListApi, h5unionorderApi, myWalletApi } from '@/service/bill'
+import { getBillListApi, createPaymentRecordApi, myWalletApi } from '@/service/bill'
 import { useLoginStore } from '@/store'
 import { storeToRefs } from 'pinia'
 import { BillPayStatusEnum, BillPayStatusValueEnum } from '@/enum/billPayStatusEnum'
@@ -294,7 +295,7 @@ const formatDate = (date: Date): string => {
 const onDateConfirm = (value: any) => {
   const [startDate, endDate] = value?.value || []
   if (startDate && endDate) {
-    const startStr = formatDate(new Date(startDate))
+    const startStr = formatDate(new Date(startDate), 'YYYY-MM-DD')
     const endStr = formatDate(new Date(endDate))
     dateRangeText.value = `${startStr}-${endStr}`
     pageQuery.startTimeStart = startStr
@@ -374,22 +375,23 @@ const confirmPay = async () => {
   if (!isAgreed.value) {
     uni.showToast({ title: '请先阅读并同意服务协议', icon: 'none' })
   }
-  uni.showToast({
-    title: '支付功能待完成',
-    icon: 'none',
-  })
-
-  // const res = await h5unionorderApi({
-  //   paymentPurpose: 1,
-  //   billId: selectedBills.value[0].id,
-  //   amount: parseFloat(propertyTotal.value),
-  //   walletId: myWalletInfo.value?.id,
-  //   lateFeeAmount: 0,
-  //   prepaidDeduction: 0,
-  //   paymentTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+  // uni.showToast({
+  //   title: '支付功能待完成',
+  //   icon: 'none',
   // })
-  // if (res?.code === '0000') {
-  // }
+
+  const res = await createPaymentRecordApi({
+    paymentPurpose: 0,
+    billId: selectedBills.value[0].id,
+    amount: parseFloat(propertyTotal.value),
+    walletId: myWalletInfo.value?.id,
+    payer: 'oLTQ85Ef7PDBu_LgtESzW6E4Uqpc',
+    lateFeeAmount: 0,
+    prepaidDeduction: 0,
+    // paymentTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+  })
+  if (res?.code === '0000') {
+  }
 }
 
 const onCreateCertificate = () => {
@@ -669,12 +671,14 @@ const onLoadMyWallet = async () => {
 }
 
 .agreement-box {
+  display: flex;
   margin-top: 10rpx;
   margin-bottom: 40rpx;
 
   :deep(.wd-checkbox) {
     display: flex;
     align-items: flex-start;
+    min-width: 40rpx;
   }
 
   :deep(.wd-checkbox__shape) {
@@ -687,6 +691,7 @@ const onLoadMyWallet = async () => {
   }
 
   .agreement-text {
+    flex: 1;
     font-size: 24rpx;
     color: #999999;
   }
@@ -774,5 +779,15 @@ const onLoadMyWallet = async () => {
   width: 100%;
   height: 100%;
   opacity: 0;
+}
+
+:deep(.wd-month__day.is-middle .wd-month__day-container) {
+  background-color: #fff6ec !important;
+}
+
+:deep(.wd-month__day.is-end .wd-month__day-container),
+:deep(.wd-month__day.is-start .wd-month__day-container),
+:deep(.wd-month__day.is-start::after) {
+  background-color: #ff8c00 !important;
 }
 </style>
